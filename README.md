@@ -48,10 +48,12 @@ This section lists the contracts that are pre-deployed (i.e., loaded into state 
 - [Safe Singleton Factory](#safesingletonfactory-v1043)
 - [GnosisSafe v1.3.0](#gnosissafe-v130)
 - [GnosisSafeL2 v1.3.0](#gnosissafel2-v130)
+- [GnosisSafeProxyFactory v1.3.0](#gnosissafeproxyfactory-v130)
 - [MultiSend v1.3.0](#multisend-v130)
 - [MultiSendCallOnly v1.3.0](#multisendcallonly-v130)
 - [Safe v1.4.1](#safe-v141)
 - [SafeL2 v1.4.1](#safel2-v141)
+- [SafeProxyFactory v1.4.1](#safeproxyfactory-v141)
 - [MultiSend v1.4.1](#multisend-v141)
 - [MultiSendCallOnly v1.4.1](#multisendcallonly-v141)
 - [Multicall3](#multicall3)
@@ -140,6 +142,25 @@ Follow the building instructions of the repository and obtain the creation bytec
 
 The target address can be verified in the [Safe deployments](https://github.com/safe-global/safe-deployments?tab=readme-ov-file#deployments-overview) repository.
 
+### GnosisSafeProxyFactory v1.3.0
+
+Deployed at `0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2` and `0xC22834581EbC8527d974F8a1c97E1bEA4EF910BC` using CREATE2.
+
+Source code available at https://github.com/safe-global/safe-smart-account/blob/v1.3.0/contracts/proxies/GnosisSafeProxyFactory.sol .
+
+Note: there are 2 addresses where this Safe can be deployed to:
+
+- `0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2`: when using Arachnid's CREATE2 proxy (the canonical address)
+- `0xC22834581EbC8527d974F8a1c97E1bEA4EF910BC`: when using the safe singleton factory
+
+This script deploys the contract to both addresses.
+
+#### How to verify the creation bytecode and the target address
+
+Follow the building instructions of the repository and obtain the creation bytecode in the artifacts json file.
+
+The target address can be verified in the [Safe deployments](https://github.com/safe-global/safe-deployments?tab=readme-ov-file#deployments-overview) repository.
+
 ### MultiSend v1.3.0
 
 Deployed at `0xa238cbeb142c10ef7ad8442c6d1f9e89e07e7761` and `0x998739BFdAAdde7C933B942a68053933098f9EDa` using CREATE2.
@@ -197,6 +218,20 @@ The target address can be verified in the [Safe deployments](https://github.com/
 Deployed at `0x29fcB43b46531BcA003ddC8FCB67FFE91900C762` using CREATE2.
 
 Source code available at https://github.com/safe-global/safe-smart-account/blob/v1.4.1/contracts/SafeL2.sol .
+
+This contract is deployed using the Safe Singleton Factory.
+
+#### How to verify the creation bytecode and the target address
+
+Follow the building instructions of the repository and obtain the creation bytecode in the artifacts json file.
+
+The target address can be verified in the [Safe deployments](https://github.com/safe-global/safe-deployments?tab=readme-ov-file#deployments-overview) repository.
+
+### SafeProxyFactory v1.4.1
+
+Deployed at `0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67` using CREATE2.
+
+Source code available at https://github.com/safe-global/safe-smart-account/blob/v1.4.1/contracts/proxies/SafeProxyFactory.sol .
 
 This contract is deployed using the Safe Singleton Factory.
 

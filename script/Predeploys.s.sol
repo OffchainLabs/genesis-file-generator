@@ -237,6 +237,20 @@ contract Predeploys is Script {
             vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
         }
 
+        // -----------------------------------------------
+        // SafeProxyFactory v1.3 - canonical (via CREATE2)
+        // -----------------------------------------------
+        {
+            console.log("Deploying SafeProxyFactory v1.3");
+            address contractAddress = SafeProxyFactory1_3CanonicalAddress;
+            (bytes memory contractCode, bytes32[] memory contractWriteSlots) =
+                deployContractViaCreate2(SafeProxyFactory1_3CreationBytecode, SafeProxyFactory1_3Salt, contractAddress);
+            console.log("Contract deployed at:", contractAddress);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
+        }
+
         // ----------------------------------------
         // Multisend v1.3 - canonical (via CREATE2)
         // ----------------------------------------
@@ -289,6 +303,24 @@ contract Predeploys is Script {
             address contractAddress = SafeL21_3Eip155Address;
             (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(
                 SafeL21_3CreationBytecode, SafeL21_3Salt, contractAddress, SafeSingletonFactoryAddress
+            );
+            console.log("Contract deployed at:", contractAddress);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
+        }
+
+        // ---------------------------------------------
+        // SafeProxyFactory v1.3 - EIP-155 (via CREATE2)
+        // ---------------------------------------------
+        {
+            console.log("Deploying SafeProxyFactory v1.3 (EIP-155)");
+            address contractAddress = SafeProxyFactory1_3Eip155Address;
+            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(
+                SafeProxyFactory1_3CreationBytecode,
+                SafeProxyFactory1_3Salt,
+                contractAddress,
+                SafeSingletonFactoryAddress
             );
             console.log("Contract deployed at:", contractAddress);
             string memory contractJson =
@@ -352,6 +384,24 @@ contract Predeploys is Script {
             address contractAddress = SafeL21_4_1Address;
             (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(
                 SafeL21_4_1CreationBytecode, SafeL21_4_1Salt, SafeL21_4_1Address, SafeSingletonFactoryAddress
+            );
+            console.log("Contract deployed at:", contractAddress);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
+        }
+
+        // -------------------------------------------------
+        // SafeProxyFactory v1.4.1 - canonical (via CREATE2)
+        // -------------------------------------------------
+        {
+            console.log("Deploying SafeProxyFactory v1.4.1");
+            address contractAddress = SafeProxyFactory1_4_1Address;
+            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(
+                SafeProxyFactory1_4_1CreationBytecode,
+                SafeProxyFactory1_4_1Salt,
+                SafeProxyFactory1_4_1Address,
+                SafeSingletonFactoryAddress
             );
             console.log("Contract deployed at:", contractAddress);
             string memory contractJson =
