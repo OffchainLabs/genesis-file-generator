@@ -13,7 +13,7 @@ contract Predeploys is Script {
     address deployer = makeAddr("deployer");
 
     /// @notice Output path for the generated JSON file
-    string jsonOutPath = "out/genesis.json";
+    string jsonOutPath = "genesis/genesis.json";
 
     /// @notice Initial environment variables
     bool isAnyTrust;
