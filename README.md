@@ -45,11 +45,15 @@ This tool uses a Foundry script to deploy all contracts to the local chain creat
 
 This section lists the contracts that are pre-deployed (i.e., loaded into state at genesis).
 
-- [GnosisSafe v1.3.0](#gnosissafe-v130-canonical)
-- [GnosisSafeL2 v1.3.0](#gnosissafel2-v130-canonical)
-- [MultiSend v1.3.0](#multisend-v130-canonical)
-- [MultiSendCallOnly v1.3.0](#multisendcallonly-v130-canonical)
 - [Safe Singleton Factory](#safesingletonfactory-v1043)
+- [GnosisSafe v1.3.0](#gnosissafe-v130)
+- [GnosisSafeL2 v1.3.0](#gnosissafel2-v130)
+- [MultiSend v1.3.0](#multisend-v130)
+- [MultiSendCallOnly v1.3.0](#multisendcallonly-v130)
+- [Safe v1.4.1](#safe-v141)
+- [SafeL2 v1.4.1](#safel2-v141)
+- [MultiSend v1.4.1](#multisend-v141)
+- [MultiSendCallOnly v1.4.1](#multisendcallonly-v141)
 - [Multicall3](#multicall3)
 - [Create2Deployer](#create2deployer)
 - [CreateX](#createx)
@@ -69,82 +73,6 @@ This section lists the contracts that are pre-deployed (i.e., loaded into state 
 - [KernelFactory v3.3 (for Entrypoing v0.7.0)](#kernelfactory-v33-for-entrypoing-v070)
 - [MetaFactory (FactoryStaker) v3.0](#metafactory-factorystaker-v30)
 - [ECDSAValidator v3.1 (commit 8f7fd99)](#ecdsavalidator-v31-commit-8f7fd99)
-
-### GnosisSafe v1.3.0 (canonical)
-
-Deployed at `0xd9Db270c1B5E3Bd161E8c8503c55cEABeE709552` using CREATE2.
-
-Source code available at https://github.com/safe-global/safe-smart-account/blob/v1.3.0/contracts/GnosisSafe.sol .
-
-Note: there are 2 addresses where this Safe can be deployed to:
-
-- `0x69f4D1788e39c87893C980c06EdF4b7f686e2938`: when using the safe singleton factory
-- `0xd9Db270c1B5E3Bd161E8c8503c55cEABeE709552`: when using Arachnid's CREATE2 proxy
-
-In this case, we'll use the canonical CREATE2 method, instead of Safe's factory
-
-#### How to verify the creation bytecode and the target address
-
-Follow the building instructions of the repository and obtain the creation bytecode in the artifacts json file.
-
-The target address can be verified in the [Safe deployments](https://github.com/safe-global/safe-deployments?tab=readme-ov-file#deployments-overview) repository.
-
-### GnosisSafeL2 v1.3.0 (canonical)
-
-Deployed at `0x3e5c63644e683549055b9be8653de26e0b4cd36e` using CREATE2.
-
-Source code available at https://github.com/safe-global/safe-smart-account/blob/v1.3.0/contracts/GnosisSafeL2.sol .
-
-Note: there are 2 addresses where this Safe can be deployed to:
-
-- `0xfb1bffC9d739B8D520DaF37dF666da4C687191EA`: when using the safe singleton factory
-- `0x3e5c63644e683549055b9be8653de26e0b4cd36e`: when using Arachnid's CREATE2 proxy
-
-In this case, we'll use the canonical CREATE2 method, instead of Safe's factory
-
-#### How to verify the creation bytecode and the target address
-
-Follow the building instructions of the repository and obtain the creation bytecode in the artifacts json file.
-
-The target address can be verified in the [Safe deployments](https://github.com/safe-global/safe-deployments?tab=readme-ov-file#deployments-overview) repository.
-
-### MultiSend v1.3.0 (canonical)
-
-Deployed at `0xa238cbeb142c10ef7ad8442c6d1f9e89e07e7761` using CREATE2.
-
-Source code available at https://github.com/safe-global/safe-smart-account/blob/v1.3.0/contracts/libraries/MultiSend.sol .
-
-Note: there are 2 addresses where this contract can be deployed to:
-
-- `0x998739BFdAAdde7C933B942a68053933098f9EDa`: when using the safe singleton factory
-- `0xa238cbeb142c10ef7ad8442c6d1f9e89e07e7761`: when using Arachnid's CREATE2 proxy
-
-In this case, we'll use the canonical CREATE2 method, instead of Safe's factory
-
-#### How to verify the creation bytecode and the target address
-
-Follow the building instructions of the repository and obtain the creation bytecode in the artifacts json file.
-
-The target address can be verified in the [Safe deployments](https://github.com/safe-global/safe-deployments?tab=readme-ov-file#deployments-overview) repository.
-
-### MultiSendCallOnly v1.3.0 (canonical)
-
-Deployed at `0x40a2accbd92bca938b02010e17a5b8929b49130d` using CREATE2.
-
-Source code available at https://github.com/safe-global/safe-smart-account/blob/v1.3.0/contracts/libraries/MultiSendCallOnly.sol .
-
-Note: there are 2 addresses where this contract can be deployed to:
-
-- `0xA1dabEF33b3B82c7814B6D82A79e50F4AC44102B`: when using the safe singleton factory
-- `0x40a2accbd92bca938b02010e17a5b8929b49130d`: when using Arachnid's CREATE2 proxy
-
-In this case, we'll use the canonical CREATE2 method, instead of Safe's factory
-
-#### How to verify the creation bytecode and the target address
-
-Follow the building instructions of the repository and obtain the creation bytecode in the artifacts json file.
-
-The target address can be verified in the [Safe deployments](https://github.com/safe-global/safe-deployments?tab=readme-ov-file#deployments-overview) repository.
 
 ### SafeSingletonFactory v1.0.43
 
@@ -173,6 +101,138 @@ Bytecode:
 Alternative, the runtime bytecode can be verified in any block explorer, for example, in [Arbiscan](https://arbiscan.io/address/0x914d7Fec6aaC8cd542e72Bca78B30650d45643d7#code).
 
 The target address can be verified in the project's [repository](https://github.com/safe-global/safe-singleton-factory/#expected-addresses).
+
+### GnosisSafe v1.3.0
+
+Deployed at `0xd9Db270c1B5E3Bd161E8c8503c55cEABeE709552` and `0x69f4D1788e39c87893C980c06EdF4b7f686e2938` using CREATE2.
+
+Source code available at https://github.com/safe-global/safe-smart-account/blob/v1.3.0/contracts/GnosisSafe.sol .
+
+Note: there are 2 addresses where this Safe can be deployed to:
+
+- `0xd9Db270c1B5E3Bd161E8c8503c55cEABeE709552`: when using Arachnid's CREATE2 proxy (the canonical address)
+- `0x69f4D1788e39c87893C980c06EdF4b7f686e2938`: when using the safe singleton factory
+
+This script deploys the contract to both addresses.
+
+#### How to verify the creation bytecode and the target address
+
+Follow the building instructions of the repository and obtain the creation bytecode in the artifacts json file.
+
+The target address can be verified in the [Safe deployments](https://github.com/safe-global/safe-deployments?tab=readme-ov-file#deployments-overview) repository.
+
+### GnosisSafeL2 v1.3.0
+
+Deployed at `0x3e5c63644e683549055b9be8653de26e0b4cd36e` and `0xfb1bffC9d739B8D520DaF37dF666da4C687191EA` using CREATE2.
+
+Source code available at https://github.com/safe-global/safe-smart-account/blob/v1.3.0/contracts/GnosisSafeL2.sol .
+
+Note: there are 2 addresses where this Safe can be deployed to:
+
+- `0x3e5c63644e683549055b9be8653de26e0b4cd36e`: when using Arachnid's CREATE2 proxy (the canonical address)
+- `0xfb1bffC9d739B8D520DaF37dF666da4C687191EA`: when using the safe singleton factory
+
+This script deploys the contract to both addresses.
+
+#### How to verify the creation bytecode and the target address
+
+Follow the building instructions of the repository and obtain the creation bytecode in the artifacts json file.
+
+The target address can be verified in the [Safe deployments](https://github.com/safe-global/safe-deployments?tab=readme-ov-file#deployments-overview) repository.
+
+### MultiSend v1.3.0
+
+Deployed at `0xa238cbeb142c10ef7ad8442c6d1f9e89e07e7761` and `0x998739BFdAAdde7C933B942a68053933098f9EDa` using CREATE2.
+
+Source code available at https://github.com/safe-global/safe-smart-account/blob/v1.3.0/contracts/libraries/MultiSend.sol .
+
+Note: there are 2 addresses where this contract can be deployed to:
+
+- `0xa238cbeb142c10ef7ad8442c6d1f9e89e07e7761`: when using Arachnid's CREATE2 proxy (the canonical address)
+- `0x998739BFdAAdde7C933B942a68053933098f9EDa`: when using the safe singleton factory
+
+This script deploys the contract to both addresses.
+
+#### How to verify the creation bytecode and the target address
+
+Follow the building instructions of the repository and obtain the creation bytecode in the artifacts json file.
+
+The target address can be verified in the [Safe deployments](https://github.com/safe-global/safe-deployments?tab=readme-ov-file#deployments-overview) repository.
+
+### MultiSendCallOnly v1.3.0
+
+Deployed at `0x40a2accbd92bca938b02010e17a5b8929b49130d` and `0xA1dabEF33b3B82c7814B6D82A79e50F4AC44102B` using CREATE2.
+
+Source code available at https://github.com/safe-global/safe-smart-account/blob/v1.3.0/contracts/libraries/MultiSendCallOnly.sol .
+
+Note: there are 2 addresses where this contract can be deployed to:
+
+- `0x40a2accbd92bca938b02010e17a5b8929b49130d`: when using Arachnid's CREATE2 proxy (the canonical address)
+- `0xA1dabEF33b3B82c7814B6D82A79e50F4AC44102B`: when using the safe singleton factory
+
+This script deploys the contract to both addresses.
+
+#### How to verify the creation bytecode and the target address
+
+Follow the building instructions of the repository and obtain the creation bytecode in the artifacts json file.
+
+The target address can be verified in the [Safe deployments](https://github.com/safe-global/safe-deployments?tab=readme-ov-file#deployments-overview) repository.
+
+### Safe v1.4.1
+
+Deployed at `0x41675C099F32341bf84BFc5382aF534df5C7461a` using CREATE2.
+
+Source code available at https://github.com/safe-global/safe-smart-account/blob/v1.4.1/contracts/Safe.sol .
+
+This contract is deployed using the Safe Singleton Factory.
+
+#### How to verify the creation bytecode and the target address
+
+Follow the building instructions of the repository and obtain the creation bytecode in the artifacts json file.
+
+The target address can be verified in the [Safe deployments](https://github.com/safe-global/safe-deployments?tab=readme-ov-file#deployments-overview) repository.
+
+### SafeL2 v1.4.1
+
+Deployed at `0x29fcB43b46531BcA003ddC8FCB67FFE91900C762` using CREATE2.
+
+Source code available at https://github.com/safe-global/safe-smart-account/blob/v1.4.1/contracts/SafeL2.sol .
+
+This contract is deployed using the Safe Singleton Factory.
+
+#### How to verify the creation bytecode and the target address
+
+Follow the building instructions of the repository and obtain the creation bytecode in the artifacts json file.
+
+The target address can be verified in the [Safe deployments](https://github.com/safe-global/safe-deployments?tab=readme-ov-file#deployments-overview) repository.
+
+### MultiSend v1.4.1
+
+Deployed at `0x38869bf66a61cF6bDB996A6aE40D5853Fd43B526` using CREATE2.
+
+Source code available at https://github.com/safe-global/safe-smart-account/blob/v1.4.1/contracts/libraries/MultiSend.sol .
+
+This contract is deployed using the Safe Singleton Factory.
+
+#### How to verify the creation bytecode and the target address
+
+Follow the building instructions of the repository and obtain the creation bytecode in the artifacts json file.
+
+The target address can be verified in the [Safe deployments](https://github.com/safe-global/safe-deployments?tab=readme-ov-file#deployments-overview) repository.
+
+### MultiSendCallOnly v1.4.1
+
+Deployed at `0x9641d764fc13c8B624c04430C7356C1C7C8102e2` using CREATE2.
+
+Source code available at https://github.com/safe-global/safe-smart-account/blob/v1.4.1/contracts/libraries/MultiSendCallOnly.sol .
+
+This contract is deployed using the Safe Singleton Factory.
+
+#### How to verify the creation bytecode and the target address
+
+Follow the building instructions of the repository and obtain the creation bytecode in the artifacts json file.
+
+The target address can be verified in the [Safe deployments](https://github.com/safe-global/safe-deployments?tab=readme-ov-file#deployments-overview) repository.
 
 ### Multicall3
 

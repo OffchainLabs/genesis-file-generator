@@ -111,6 +111,8 @@ contract Predeploys is Script {
         public
         returns (bytes memory code, bytes32[] memory writeSlots)
     {
+        return deployContractViaCreate2(bytecode, salt, expectedAddr, ArachnidsAddress);
+        /*
         address addr;
         vm.record();
         vm.broadcast();
@@ -118,6 +120,39 @@ contract Predeploys is Script {
             addr := create2(0, add(bytecode, 0x20), mload(bytecode), salt)
         }
         vm.stopRecord();
+
+        // Verify that the contract was deployed
+        require(addr != address(0), "CREATE2 failed");
+
+        // Verify that the contract was deployed to the expected address
+        require(addr == expectedAddr, "Contract deployed to incorrect address");
+
+        // Return the runtime bytecode of the deployed contract and the written storage slots
+        code = expectedAddr.code;
+        (, writeSlots) = vm.accesses(expectedAddr);
+        */
+    }
+
+    /// @notice Deploys a contract's bytecode using CREATE2
+    /// @param bytecode The bytecode to deploy
+    /// @param salt The salt to use for CREATE2
+    /// @param expectedAddr The expected address of the deployed contract
+    /// @return code The runtime bytecode of the deployed contract
+    /// @return writeSlots The storage slots that were written during deployment
+    function deployContractViaCreate2(bytes memory bytecode, bytes32 salt, address expectedAddr, address proxyAddress)
+        public
+        returns (bytes memory code, bytes32[] memory writeSlots)
+    {
+        vm.record();
+        vm.broadcast();
+        bytes memory callData = abi.encodePacked(salt, bytecode);
+        (bool success, bytes memory result) = proxyAddress.call(callData);
+        vm.stopRecord();
+
+        // Verify that the call to the proxy was successful
+        require(success, "CREATE2 proxy call failed");
+
+        address addr = address(bytes20(result));
 
         // Verify that the contract was deployed
         require(addr != address(0), "CREATE2 failed");
@@ -160,13 +195,28 @@ contract Predeploys is Script {
         string memory genesisAllocJson = "genesisAllocJson";
 
         // -----------------------------------
+        // Safe Singleton Factory (via CREATE)
+        // -----------------------------------
+        {
+            console.log("Deploying Safe Singleton Factory");
+            address contractAddress = SafeSingletonFactoryAddress;
+            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate(
+                SafeSingletonFactoryCreationBytecode, SafeSingletonFactoryDeployerAddress, SafeSingletonFactoryAddress
+            );
+            console.log("Contract deployed at:", contractAddress);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
+        }
+
+        // -----------------------------------
         // Safe v1.3 - canonical (via CREATE2)
         // -----------------------------------
         {
             console.log("Deploying Safe v1.3");
-            address contractAddress = Safe1_3Address;
+            address contractAddress = Safe1_3CanonicalAddress;
             (bytes memory contractCode, bytes32[] memory contractWriteSlots) =
-                deployContractViaCreate2(Safe1_3CreationBytecode, Safe1_3Salt, Safe1_3Address);
+                deployContractViaCreate2(Safe1_3CreationBytecode, Safe1_3Salt, contractAddress);
             console.log("Contract deployed at:", contractAddress);
             string memory contractJson =
                 addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
@@ -178,9 +228,9 @@ contract Predeploys is Script {
         // -------------------------------------
         {
             console.log("Deploying SafeL2 v1.3");
-            address contractAddress = SafeL21_3Address;
+            address contractAddress = SafeL21_3CanonicalAddress;
             (bytes memory contractCode, bytes32[] memory contractWriteSlots) =
-                deployContractViaCreate2(SafeL21_3CreationBytecode, SafeL21_3Salt, SafeL21_3Address);
+                deployContractViaCreate2(SafeL21_3CreationBytecode, SafeL21_3Salt, contractAddress);
             console.log("Contract deployed at:", contractAddress);
             string memory contractJson =
                 addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
@@ -192,9 +242,9 @@ contract Predeploys is Script {
         // ----------------------------------------
         {
             console.log("Deploying Multisend v1.3");
-            address contractAddress = Multisend1_3Address;
+            address contractAddress = Multisend1_3CanonicalAddress;
             (bytes memory contractCode, bytes32[] memory contractWriteSlots) =
-                deployContractViaCreate2(Multisend1_3CreationBytecode, Multisend1_3Salt, Multisend1_3Address);
+                deployContractViaCreate2(Multisend1_3CreationBytecode, Multisend1_3Salt, contractAddress);
             console.log("Contract deployed at:", contractAddress);
             string memory contractJson =
                 addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
@@ -206,9 +256,24 @@ contract Predeploys is Script {
         // ------------------------------------------------
         {
             console.log("Deploying MultisendCallOnly v1.3");
-            address contractAddress = MultisendCallOnly1_3Address;
+            address contractAddress = MultisendCallOnly1_3CanonicalAddress;
             (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(
-                MultisendCallOnly1_3CreationBytecode, MultisendCallOnly1_3Salt, MultisendCallOnly1_3Address
+                MultisendCallOnly1_3CreationBytecode, MultisendCallOnly1_3Salt, contractAddress
+            );
+            console.log("Contract deployed at:", contractAddress);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
+        }
+
+        // ---------------------------------
+        // Safe v1.3 - EIP-155 (via CREATE2)
+        // ---------------------------------
+        {
+            console.log("Deploying Safe v1.3 (EIP-155)");
+            address contractAddress = Safe1_3Eip155Address;
+            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(
+                Safe1_3CreationBytecode, Safe1_3Salt, contractAddress, SafeSingletonFactoryAddress
             );
             console.log("Contract deployed at:", contractAddress);
             string memory contractJson =
@@ -217,13 +282,109 @@ contract Predeploys is Script {
         }
 
         // -----------------------------------
-        // Safe Singleton Factory (via CREATE)
+        // SafeL2 v1.3 - EIP-155 (via CREATE2)
         // -----------------------------------
         {
-            console.log("Deploying Safe Singleton Factory");
-            address contractAddress = SafeSingletonFactoryAddress;
-            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate(
-                SafeSingletonFactoryCreationBytecode, SafeSingletonFactoryDeployerAddress, SafeSingletonFactoryAddress
+            console.log("Deploying SafeL2 v1.3 (EIP-155)");
+            address contractAddress = SafeL21_3Eip155Address;
+            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(
+                SafeL21_3CreationBytecode, SafeL21_3Salt, contractAddress, SafeSingletonFactoryAddress
+            );
+            console.log("Contract deployed at:", contractAddress);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
+        }
+
+        // --------------------------------------
+        // Multisend v1.3 - EIP-155 (via CREATE2)
+        // --------------------------------------
+        {
+            console.log("Deploying Multisend v1.3 (EIP-155)");
+            address contractAddress = Multisend1_3Eip155Address;
+            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(
+                Multisend1_3CreationBytecode, Multisend1_3Salt, contractAddress, SafeSingletonFactoryAddress
+            );
+            console.log("Contract deployed at:", contractAddress);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
+        }
+
+        // ----------------------------------------------
+        // MultisendCallOnly v1.3 - EIP-155 (via CREATE2)
+        // ----------------------------------------------
+        {
+            console.log("Deploying MultisendCallOnly v1.3 (EIP-155)");
+            address contractAddress = MultisendCallOnly1_3Eip155Address;
+            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(
+                MultisendCallOnly1_3CreationBytecode,
+                MultisendCallOnly1_3Salt,
+                contractAddress,
+                SafeSingletonFactoryAddress
+            );
+            console.log("Contract deployed at:", contractAddress);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
+        }
+
+        // -------------------------------------
+        // Safe v1.4.1 - canonical (via CREATE2)
+        // -------------------------------------
+        {
+            console.log("Deploying Safe v1.4.1");
+            address contractAddress = Safe1_4_1Address;
+            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(
+                Safe1_4_1CreationBytecode, Safe1_4_1Salt, Safe1_4_1Address, SafeSingletonFactoryAddress
+            );
+            console.log("Contract deployed at:", contractAddress);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
+        }
+
+        // ---------------------------------------
+        // SafeL2 v1.4.1 - canonical (via CREATE2)
+        // ---------------------------------------
+        {
+            console.log("Deploying SafeL2 v1.4.1");
+            address contractAddress = SafeL21_4_1Address;
+            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(
+                SafeL21_4_1CreationBytecode, SafeL21_4_1Salt, SafeL21_4_1Address, SafeSingletonFactoryAddress
+            );
+            console.log("Contract deployed at:", contractAddress);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
+        }
+
+        // ------------------------------------------
+        // Multisend v1.4.1 - canonical (via CREATE2)
+        // ------------------------------------------
+        {
+            console.log("Deploying Multisend v1.4.1");
+            address contractAddress = Multisend1_4_1Address;
+            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(
+                Multisend1_4_1CreationBytecode, Multisend1_4_1Salt, Multisend1_4_1Address, SafeSingletonFactoryAddress
+            );
+            console.log("Contract deployed at:", contractAddress);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
+        }
+
+        // --------------------------------------------------
+        // MultisendCallOnly v1.4.1 - canonical (via CREATE2)
+        // --------------------------------------------------
+        {
+            console.log("Deploying MultisendCallOnly v1.4.1");
+            address contractAddress = MultisendCallOnly1_4_1Address;
+            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(
+                MultisendCallOnly1_4_1CreationBytecode,
+                MultisendCallOnly1_4_1Salt,
+                MultisendCallOnly1_4_1Address,
+                SafeSingletonFactoryAddress
             );
             console.log("Contract deployed at:", contractAddress);
             string memory contractJson =
