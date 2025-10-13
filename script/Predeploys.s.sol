@@ -215,15 +215,37 @@ contract Predeploys is Script {
             vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
         }
 
-        // ----------------------------
+        // ------------------------------------------
         // Create2Deployer (via CREATE)
-        // ----------------------------
+        // We also renounce ownership of the contract
+        // ------------------------------------------
         {
             console.log("Deploying Create2Deployer");
             address contractAddress = Create2DeployerAddress;
             (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate(Create2DeployerCreationBytecode, Create2DeployerDeployerAddress, Create2DeployerAddress);
+
+            // Renouncing ownership
+            console.log("Renouncing ownership of Create2Deployer");
+            vm.record();
+            vm.broadcast(Create2DeployerDeployerAddress);
+            (bool success, ) = Create2DeployerAddress.call(abi.encodeWithSignature("renounceOwnership()"));
+            vm.stopRecord();
+            require(success, "Renouncing ownership failed");
+            (, bytes32[] memory renounceWriteSlots) = vm.accesses(Create2DeployerAddress);
+
+            // Merge write slots
+            // Note: we don't really need to merge since the slot that is modified is the same,
+            // but this is to keep the output consistent
+            bytes32[] memory mergedWriteSlots = new bytes32[](contractWriteSlots.length + renounceWriteSlots.length);
+            for (uint i = 0; i < contractWriteSlots.length; i++) {
+                mergedWriteSlots[i] = contractWriteSlots[i];
+            }
+            for (uint j = 0; j < renounceWriteSlots.length; j++) {
+                mergedWriteSlots[contractWriteSlots.length + j] = renounceWriteSlots[j];
+            }
+
             console.log("Contract deployed at:", contractAddress);
-            string memory contractJson = addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            string memory contractJson = addPredeployInformationToJson(contractAddress, contractCode, mergedWriteSlots);
             vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
         }
 

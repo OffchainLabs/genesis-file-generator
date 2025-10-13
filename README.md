@@ -79,13 +79,15 @@ Source code available at https://github.com/safe-global/safe-smart-account/blob/
 Note: there are 2 addresses where this Safe can be deployed to:
 
 - `0x69f4D1788e39c87893C980c06EdF4b7f686e2938`: when using the safe singleton factory
-- `0xd9Db270c1B5E3Bd161E8c8503c55cEABeE709552`: when using Arachnid's CREATE2
+- `0xd9Db270c1B5E3Bd161E8c8503c55cEABeE709552`: when using Arachnid's CREATE2 proxy
 
 In this case, we'll use the canonical CREATE2 method, instead of Safe's factory
 
-#### How to verify the creation bytecode
+#### How to verify the creation bytecode and the target address
 
 Follow the building instructions of the repository and obtain the creation bytecode in the artifacts json file.
+
+The target address can be verified in the [Safe deployments](https://github.com/safe-global/safe-deployments?tab=readme-ov-file#deployments-overview) repository.
 
 ### GnosisSafeL2 v1.3.0 (canonical)
 
@@ -96,13 +98,15 @@ Source code available at https://github.com/safe-global/safe-smart-account/blob/
 Note: there are 2 addresses where this Safe can be deployed to:
 
 - `0xfb1bffC9d739B8D520DaF37dF666da4C687191EA`: when using the safe singleton factory
-- `0x3e5c63644e683549055b9be8653de26e0b4cd36e`: when using Arachnid's CREATE2
+- `0x3e5c63644e683549055b9be8653de26e0b4cd36e`: when using Arachnid's CREATE2 proxy
 
 In this case, we'll use the canonical CREATE2 method, instead of Safe's factory
 
-#### How to verify the creation bytecode
+#### How to verify the creation bytecode and the target address
 
-Follow the build instructions of the repository and obtain the creation bytecode in the artifacts json file.
+Follow the building instructions of the repository and obtain the creation bytecode in the artifacts json file.
+
+The target address can be verified in the [Safe deployments](https://github.com/safe-global/safe-deployments?tab=readme-ov-file#deployments-overview) repository.
 
 ### MultiSend v1.3.0 (canonical)
 
@@ -113,13 +117,15 @@ Source code available at https://github.com/safe-global/safe-smart-account/blob/
 Note: there are 2 addresses where this contract can be deployed to:
 
 - `0x998739BFdAAdde7C933B942a68053933098f9EDa`: when using the safe singleton factory
-- `0xa238cbeb142c10ef7ad8442c6d1f9e89e07e7761`: when using Arachnid's CREATE2
+- `0xa238cbeb142c10ef7ad8442c6d1f9e89e07e7761`: when using Arachnid's CREATE2 proxy
 
 In this case, we'll use the canonical CREATE2 method, instead of Safe's factory
 
-#### How to verify the creation bytecode
+#### How to verify the creation bytecode and the target address
 
-Follow the build instructions of the repository and obtain the creation bytecode in the artifacts json file.
+Follow the building instructions of the repository and obtain the creation bytecode in the artifacts json file.
+
+The target address can be verified in the [Safe deployments](https://github.com/safe-global/safe-deployments?tab=readme-ov-file#deployments-overview) repository.
 
 ### MultiSendCallOnly v1.3.0 (canonical)
 
@@ -130,13 +136,15 @@ Source code available at https://github.com/safe-global/safe-smart-account/blob/
 Note: there are 2 addresses where this contract can be deployed to:
 
 - `0xA1dabEF33b3B82c7814B6D82A79e50F4AC44102B`: when using the safe singleton factory
-- `0x40a2accbd92bca938b02010e17a5b8929b49130d`: when using Arachnid's CREATE2
+- `0x40a2accbd92bca938b02010e17a5b8929b49130d`: when using Arachnid's CREATE2 proxy
 
 In this case, we'll use the canonical CREATE2 method, instead of Safe's factory
 
-#### How to verify the creation bytecode
+#### How to verify the creation bytecode and the target address
 
-Follow the build instructions of the repository and obtain the creation bytecode in the artifacts json file.
+Follow the building instructions of the repository and obtain the creation bytecode in the artifacts json file.
+
+The target address can be verified in the [Safe deployments](https://github.com/safe-global/safe-deployments?tab=readme-ov-file#deployments-overview) repository.
 
 ### SafeSingletonFactory v1.0.43
 
@@ -148,7 +156,7 @@ This contract is a replica of Arachnid's Deterministic Deployment Proxy, that is
 
 To deploy this contract, we need to act as the deployer address and deploy the creation bytecode.
 
-#### How to verify the creation bytecode
+#### How to verify the creation bytecode and the target address
 
 This contract is compiled with a very old version of solc. To obtain the bytecode, run the following command:
 
@@ -164,13 +172,15 @@ Bytecode:
 
 Alternative, the runtime bytecode can be verified in any block explorer, for example, in [Arbiscan](https://arbiscan.io/address/0x914d7Fec6aaC8cd542e72Bca78B30650d45643d7#code).
 
+The target address can be verified in the project's [repository](https://github.com/safe-global/safe-singleton-factory/#expected-addresses).
+
 ### Multicall3
 
 Deployed at `0xcA11bde05977b3631167028862bE2a173976CA11` using a pre-signed transaction.
 
 Source code available at https://github.com/mds1/multicall3/blob/v3.1.0/src/Multicall3.sol .
 
-#### How to verify the pre-signed transaction and the runtime bytecode
+#### How to verify the pre-signed transaction, the runtime bytecode and the target address
 
 The pre-signed transaction for this contract is available at [its repository](https://github.com/mds1/multicall3#new-deployments).
 
@@ -180,6 +190,8 @@ Note that compiling the contract in the repository yields the same bytecode with
 
 Alternative, the runtime bytecode can be verified in any block explorer, for example, in [Arbiscan](https://arbiscan.io/address/0xcA11bde05977b3631167028862bE2a173976CA11#code).
 
+The target address can be verified in the project's [repository](https://github.com/mds1/multicall3/tree/v3.1.0#multicall3-contract-addresses).
+
 ### Create2Deployer
 
 Deployed at `0x13b0D85CcB8bf860b6b79AF3029fCA081AE9beF2` using CREATE from the address `0x554282Cf65b42fc8fddc6041eb24ce5E8A0632Ad` and nonce 0.
@@ -188,11 +200,13 @@ Source code available at https://github.com/pcaversaccio/create2deployer/blob/c7
 
 To deploy this contract, we need to act as the deployer address and deploy the creation bytecode.
 
-#### How to verify the creation bytecode
+#### How to verify the creation bytecode and the target address
 
 Follow the build instructions of the repository and obtain the creation bytecode in the artifacts json file.
 
 Note: when comparing bytecodes with deployed instances, keep in mind that the contracts deployed on Ethereum, Arbitrum One, or OPStack chains are different. On Ethereum and Arbitrum One they are the deprecated versions of the contract. On OPStack chains, the version they use doesn't inherit from Ownable and Pausable. The pre-deployed contract used here is compiled with the latest version of the code, and can be verified with one of the recent deployments, for example the one on [Gravity](https://explorer.gravity.xyz/address/0x13b0D85CcB8bf860b6b79AF3029fCA081AE9beF2).
+
+The target address can be verified in the project's [repository](https://github.com/pcaversaccio/create2deployer/tree/c7b353935fd9a55110e75fba93bad936db998957#deployments-create2deployer).
 
 ### CreateX
 
@@ -200,11 +214,13 @@ Deployed at `0xba5Ed099633D3B313e4D5F7bdc1305d3c28ba5Ed` using a pre-signed tran
 
 Source code available at https://github.com/pcaversaccio/createx/blob/v1.0.0/src/CreateX.sol .
 
-#### How to verify the pre-signed transaction and the runtime bytecode
+#### How to verify the pre-signed transaction, the runtime bytecode and the target address
 
 The pre-signed transaction for this contract is available at [its repository](https://github.com/pcaversaccio/createx/blob/v1.0.0/scripts/presigned-createx-deployment-transactions/signed_serialised_transaction_gaslimit_3000000_.json).
 
 And the runtime bytecode can be verified by following the build instructions of the repository and obtaining the runtime bytecode in the artifacts json file.
+
+The target address can be verified in the project's [repository](https://github.com/pcaversaccio/createx/tree/v1.0.0#createx-deployments).
 
 ### Arachnid's Deterministic Deployment Proxy
 
@@ -214,7 +230,7 @@ Source code available at https://github.com/Arachnid/deterministic-deployment-pr
 
 This contract is already deployed on the local chain that Foundry creates to run their scripts. So the script verifies that the existing runtime bytecode is the expected one.
 
-#### How to verify the runtime bytecode
+#### How to verify the runtime bytecode and the target address
 
 This contract is compiled with a very old version of solc. To obtain the bytecode, run the following command:
 
@@ -236,15 +252,19 @@ Removing the creation component, `0x604580600e600039806000f350fe`, we are left w
 
 Alternative, the runtime bytecode can be verified in any block explorer, for example, in [Arbiscan](https://arbiscan.io/address/0x4e59b44847b379578588920cA78FbF26c0B4956C#code).
 
+The target address can be verified in the project's [repository](https://github.com/Arachnid/deterministic-deployment-proxy/tree/99f24d0e09d8fad7ddb5cd37333e92a8956c9783#latest-outputs).
+
 ### Permit2
 
 Deployed at `0x000000000022D473030F116dDEE9F6B43aC78BA3` using CREATE2.
 
 Source code available at https://github.com/Uniswap/permit2/blob/0x000000000022D473030F116dDEE9F6B43aC78BA3/src/Permit2.sol .
 
-#### How to verify the creation bytecode
+#### How to verify the creation bytecode and the target address
 
 Follow the build instructions of the repository and obtain the creation bytecode in the artifacts json file.
+
+The target address can be verified in the project's [repository](https://github.com/Uniswap/permit2/tree/0x000000000022D473030F116dDEE9F6B43aC78BA3) (the name of the branch is the expected address of the contract), and [Uniswap's documentation](https://docs.uniswap.org/contracts/v4/deployments).
 
 ### EAS SchemaRegistry v1.4.0
 
@@ -256,7 +276,7 @@ Source code available at https://github.com/ethereum-attestation-service/eas-con
 
 Follow the build instructions of the repository and obtain the creation bytecode in the artifacts json file.
 
-Note that on-chain instances are deployed using CREATE, so the address will likely be different. On-chain deployments of this contract can be found in EAS [repository](https://github.com/ethereum-attestation-service/eas-contracts#deployments).
+Note that on-chain instances are deployed using CREATE, so the target address will likely be different. On-chain deployments of this contract can be found in EAS [repository](https://github.com/ethereum-attestation-service/eas-contracts#deployments).
 
 ### EAS v1.4.0
 
@@ -268,7 +288,7 @@ Source code available at https://github.com/ethereum-attestation-service/eas-con
 
 Follow the build instructions of the repository and obtain the creation bytecode in the artifacts json file.
 
-Note that on-chain instances are deployed using CREATE, so the address will likely be different. On-chain deployments of this contract can be found in EAS [repository](https://github.com/ethereum-attestation-service/eas-contracts#deployments).
+Note that on-chain instances are deployed using CREATE, so the target address will likely be different. On-chain deployments of this contract can be found in EAS [repository](https://github.com/ethereum-attestation-service/eas-contracts#deployments).
 
 ### ERC-4337 Entrypoint v0.6.0
 
@@ -276,9 +296,11 @@ Deployed at `0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789` using CREATE2.
 
 Source code available at https://github.com/eth-infinitism/account-abstraction/blob/v0.6.0/contracts/core/EntryPoint.sol .
 
-#### How to verify the creation bytecode
+#### How to verify the creation bytecode and the target address
 
 Follow the build instructions of the repository and obtain the creation bytecode in the artifacts json file.
+
+The target address can be verified in the project's [repository](https://github.com/eth-infinitism/account-abstraction/tree/v0.6.0/deployments).
 
 ### ERC-4337 SenderCreator v0.6.0
 
@@ -288,11 +310,13 @@ Source code available at https://github.com/eth-infinitism/account-abstraction/b
 
 Since this contract is created when deploying the Entrypoint, we just verify that the runtime bytecode matches the expected one.
 
-#### How to verify the runtime bytecode
+#### How to verify the runtime bytecode and the target address
 
 Follow the build instructions of the repository and obtain the runtime bytecode in the artifacts json file.
 
 Note: to match the obtained bytecode when compiling this contract, the `optimizedComilerSettings` in the `hardhat.config.ts` file must be used.
+
+The target address can be verified in the project's [repository](https://github.com/eth-infinitism/account-abstraction/tree/v0.6.0/deployments).
 
 ### ERC-4337 Entrypoint v0.7.0
 
@@ -300,9 +324,11 @@ Deployed at `0x0000000071727De22E5E9d8BAf0edAc6f37da032` using CREATE2.
 
 Source code available at https://github.com/eth-infinitism/account-abstraction/blob/v0.7.0/contracts/core/EntryPoint.sol .
 
-#### How to verify the creation bytecode
+#### How to verify the creation bytecode and the target address
 
 Follow the build instructions of the repository and obtain the creation bytecode in the artifacts json file.
+
+The target address can be verified in the project's [repository](https://github.com/eth-infinitism/account-abstraction/tree/v0.7.0/deployments).
 
 ### ERC-4337 SenderCreator v0.7.0
 
@@ -312,11 +338,13 @@ Source code available at https://github.com/eth-infinitism/account-abstraction/b
 
 Since this contract is created when deploying the Entrypoint, we just verify that the runtime bytecode matches the expected one.
 
-#### How to verify the runtime bytecode
+#### How to verify the runtime bytecode and the target address
 
 Follow the build instructions of the repository and obtain the runtime bytecode in the artifacts json file.
 
 Note: to match the obtained bytecode when compiling this contract, the `optimizedComilerSettings` in the `hardhat.config.ts` file must be used.
+
+The target address can be verified in the project's [repository](https://github.com/eth-infinitism/account-abstraction/tree/v0.7.0/deployments).
 
 ### ERC-4337 Entrypoint v0.8.0
 
@@ -324,9 +352,11 @@ Deployed at `0x4337084d9e255ff0702461cf8895ce9e3b5ff108` using CREATE2.
 
 Source code available at https://github.com/eth-infinitism/account-abstraction/blob/v0.8.0/contracts/core/EntryPoint.sol .
 
-#### How to verify the creation bytecode
+#### How to verify the creation bytecode and the target address
 
 Follow the build instructions of the repository and obtain the creation bytecode in the artifacts json file.
+
+The target address can be verified in the project's [repository](https://github.com/eth-infinitism/account-abstraction/tree/v0.8.0#entrypoint-deployment).
 
 ### ERC-4337 SenderCreator v0.8.0
 
@@ -350,9 +380,11 @@ Deployed at `0x2dd68b007B46fBe91B9A7c3EDa5A7a1063cB5b47` using CREATE2.
 
 Source code available at https://github.com/safe-global/safe-modules/blob/4337/v0.3.0/modules/4337/contracts/SafeModuleSetup.sol .
 
-#### How to verify the creation bytecode
+#### How to verify the creation bytecode and the target address
 
 Follow the build instructions of the repository and obtain the creation bytecode in the artifacts json file.
+
+The target address can be verified in the project's [repository](https://github.com/safe-global/safe-modules/blob/4337/v0.3.0/modules/4337/CHANGELOG.md#supported-entrypoint).
 
 ### ERC-4337 Safe 4337 Module v0.3.0 (for Entrypoint v0.7.0)
 
@@ -362,9 +394,11 @@ Source code available at https://github.com/safe-global/safe-modules/blob/4337/v
 
 Note that this contract must always be associated with a specific Entrypoint, set in the constructor. In this case, it's Entrypoint v0.7.0.
 
-#### How to verify the creation bytecode
+#### How to verify the creation bytecode and the target address
 
 Follow the build instructions of the repository and obtain the creation bytecode in the artifacts json file.
+
+The target address can be verified in the project's [repository](https://github.com/safe-global/safe-modules/blob/4337/v0.3.0/modules/4337/CHANGELOG.md#supported-entrypoint).
 
 ### Kernel v3.3 (for Entrypoint v0.7.0)
 
@@ -374,7 +408,7 @@ Source code available at https://github.com/zerodevapp/kernel/blob/v3.3/src/Kern
 
 Note that this contract must always be associated with a specific Entrypoint, set in the constructor. In this case, it's the Entrypoint v0.7.0.
 
-#### How to verify the creation bytecode and the deployment address
+#### How to verify the creation bytecode and the target address
 
 Follow the build instructions of the repository and obtain the creation bytecode in the artifacts json file. Note that you must build the contracts using foundry with the profile `deploy`:
 
@@ -382,7 +416,7 @@ Follow the build instructions of the repository and obtain the creation bytecode
 FOUNDRY_PROFILE=deploy forge build
 ```
 
-Deployment address can be found in their [repository](https://github.com/zerodevapp/kernel/#addresses).
+The target address can be verified in the project's [repository](https://github.com/zerodevapp/kernel/#addresses).
 
 ### KernelFactory v3.3 (for Entrypoing v0.7.0)
 
@@ -392,7 +426,7 @@ Source code available at https://github.com/zerodevapp/kernel/blob/v3.3/src/fact
 
 Note that this contract must always be associated with a Kernel contract template that is associated with a specific Entrypoint, set in the constructor. In this case, it's the Entrypoint v0.7.0.
 
-#### How to verify the creation bytecode and the deployment address
+#### How to verify the creation bytecode and the target address
 
 Follow the build instructions of the repository and obtain the creation bytecode in the artifacts json file. Note that you must build the contracts using foundry with the profile `deploy`:
 
@@ -400,7 +434,7 @@ Follow the build instructions of the repository and obtain the creation bytecode
 FOUNDRY_PROFILE=deploy forge build
 ```
 
-Deployment address can be found in their [repository](https://github.com/zerodevapp/kernel/#addresses).
+The target address can be verified in the project's [repository](https://github.com/zerodevapp/kernel/#addresses).
 
 ### MetaFactory (FactoryStaker) v3.0
 
@@ -408,7 +442,7 @@ Deployed at `0xd703aaE79538628d27099B8c4f621bE4CCd142d5` using CREATE2.
 
 Source code available at https://github.com/zerodevapp/kernel/blob/v3.0/src/factory/FactoryStaker.sol .
 
-#### How to verify the creation bytecode and the deployment address
+#### How to verify the creation bytecode and the target address
 
 Follow the build instructions of the repository and obtain the creation bytecode in the artifacts json file. Note that you must build the contracts using foundry with the following configuration:
 
@@ -420,7 +454,7 @@ solc_version = "0.8.24"
 evm_version = "paris"
 ```
 
-Deployment address can be found in their [repository](https://github.com/zerodevapp/kernel/#addresses).
+The target address can be verified in the project's [repository](https://github.com/zerodevapp/kernel/#addresses).
 
 ### ECDSAValidator v3.1 (commit 8f7fd99)
 
@@ -428,7 +462,7 @@ Deployed at `0x845ADb2C711129d4f3966735eD98a9F09fC4cE57` using CREATE2.
 
 Source code available at https://github.com/zerodevapp/kernel/blob/8f7fd9946b9d351bb5be0428bf34c87bad7ed6c9/src/validator/ECDSAValidator.sol .
 
-#### How to verify the creation bytecode and the deployment address
+#### How to verify the creation bytecode and the target address
 
 > [!NOTE]
 > Even though the contract address is labelled as being the one for v3.1, it was actually compiled with a previous commit: `8f7fd9946b9d351bb5be0428bf34c87bad7ed6c9`. 
@@ -443,4 +477,4 @@ solc_version = "0.8.25"
 evm_version = "paris"
 ```
 
-Deployment address can be found in their [repository](https://github.com/zerodevapp/kernel/#addresses).
+The target address can be verified in the project's [repository](https://github.com/zerodevapp/kernel/#addresses).
