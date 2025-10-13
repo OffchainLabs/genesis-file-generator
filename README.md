@@ -30,7 +30,7 @@ The script will output two artifacts:
 - A genesis.json file in `out/genesis.json`
 - The genesis blockhash and sendRoot in the output of the script. For example:
     ```shell
-    BlockHash: 0xf889f684a78849b0f073f584c9b04503441032a1404fca1f8813c16517f3a7af, SendRoot: 0x17f2d1f75de0d8fb0d1e1f2cf8c6a279ed05933e551ede30f74ae3a05b1a3df2
+    BlockHash: 0xc8718e3eb62b1fab6ce0ee050385a545c21423a3b164a91545ad9e097fbd5341, SendRoot: 0xac8636f211d5a9a31ca310b8061eb2696d875ee2fa90f903d913677b1f027aed
     ```
 
 ## How are contracts pre-deployed

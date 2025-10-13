@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import {Script, console } from "forge-std/Script.sol";
-import { VmSafe } from "forge-std/Vm.sol";
+import {Script, console} from "forge-std/Script.sol";
+import {VmSafe} from "forge-std/Vm.sol";
 import "forge-std/StdJson.sol";
 import "src/PredeployConstants.sol";
 
@@ -41,7 +41,10 @@ contract Predeploys is Script {
     /// @param code The runtime bytecode of the predeploy
     /// @param storageSlots The storage slots that were written during deployment
     /// @return predeployJson The JSON object as a string
-    function addPredeployInformationToJson(address predeployAddress, bytes memory code, bytes32[] memory storageSlots) public returns (string memory) {
+    function addPredeployInformationToJson(address predeployAddress, bytes memory code, bytes32[] memory storageSlots)
+        public
+        returns (string memory)
+    {
         string memory predeployJson = string.concat("predeployJson", vm.toString(predeployAddress));
         vm.serializeUint(predeployJson, "balance", predeployAddress.balance);
         vm.serializeUint(predeployJson, "nonce", vm.getNonce(predeployAddress));
@@ -50,13 +53,17 @@ contract Predeploys is Script {
         // Storage changes
         string memory predeployStorageJson = string.concat("predeployStorageJson", vm.toString(predeployAddress));
         if (storageSlots.length > 0) {
-            for (uint i = 0; i < storageSlots.length; i++) {
+            for (uint256 i = 0; i < storageSlots.length; i++) {
                 bytes32 value = vm.load(predeployAddress, storageSlots[i]);
                 vm.serializeBytes32(predeployStorageJson, vm.toString(storageSlots[i]), value);
             }
 
             // Last entry, we obtain the json object
-            predeployStorageJson = vm.serializeBytes32(predeployStorageJson, vm.toString(storageSlots[storageSlots.length - 1]), vm.load(predeployAddress, storageSlots[storageSlots.length - 1]));
+            predeployStorageJson = vm.serializeBytes32(
+                predeployStorageJson,
+                vm.toString(storageSlots[storageSlots.length - 1]),
+                vm.load(predeployAddress, storageSlots[storageSlots.length - 1])
+            );
         } else {
             predeployStorageJson = "{}";
         }
@@ -71,7 +78,10 @@ contract Predeploys is Script {
     /// @param expectedAddr The expected address of the deployed contract
     /// @return code The runtime bytecode of the deployed contract
     /// @return writeSlots The storage slots that were written during deployment
-    function deployContractViaCreate(bytes memory bytecode, address contractDeployer, address expectedAddr) public returns (bytes memory code, bytes32[] memory writeSlots) {
+    function deployContractViaCreate(bytes memory bytecode, address contractDeployer, address expectedAddr)
+        public
+        returns (bytes memory code, bytes32[] memory writeSlots)
+    {
         address addr;
         vm.record();
         vm.broadcast(contractDeployer);
@@ -85,7 +95,7 @@ contract Predeploys is Script {
 
         // Verify that the contract was deployed to the expected address
         require(addr == expectedAddr, "Contract deployed to incorrect address");
-        
+
         // Return the runtime bytecode of the deployed contract and the written storage slots
         code = expectedAddr.code;
         (, writeSlots) = vm.accesses(expectedAddr);
@@ -97,7 +107,10 @@ contract Predeploys is Script {
     /// @param expectedAddr The expected address of the deployed contract
     /// @return code The runtime bytecode of the deployed contract
     /// @return writeSlots The storage slots that were written during deployment
-    function deployContractViaCreate2(bytes memory bytecode, bytes32 salt, address expectedAddr) public returns (bytes memory code, bytes32[] memory writeSlots) {
+    function deployContractViaCreate2(bytes memory bytecode, bytes32 salt, address expectedAddr)
+        public
+        returns (bytes memory code, bytes32[] memory writeSlots)
+    {
         address addr;
         vm.record();
         vm.broadcast();
@@ -111,7 +124,7 @@ contract Predeploys is Script {
 
         // Verify that the contract was deployed to the expected address
         require(addr == expectedAddr, "Contract deployed to incorrect address");
-        
+
         // Return the runtime bytecode of the deployed contract and the written storage slots
         code = expectedAddr.code;
         (, writeSlots) = vm.accesses(expectedAddr);
@@ -122,7 +135,10 @@ contract Predeploys is Script {
     /// @param expectedAddr The expected address of the deployed contract
     /// @return code The runtime bytecode of the deployed contract
     /// @return writeSlots The storage slots that were written during deployment
-    function deployContractViaSignedTransaction(bytes memory txData, address expectedAddr) public returns (bytes memory code, bytes32[] memory writeSlots) {
+    function deployContractViaSignedTransaction(bytes memory txData, address expectedAddr)
+        public
+        returns (bytes memory code, bytes32[] memory writeSlots)
+    {
         vm.record();
         vm.broadcastRawTransaction(txData);
         vm.stopRecord();
@@ -133,7 +149,7 @@ contract Predeploys is Script {
             size := extcodesize(expectedAddr)
         }
         require(size > 0, "No code at the expected address");
-        
+
         // Return the runtime bytecode of the deployed contract and the written storage slots
         code = expectedAddr.code;
         (, writeSlots) = vm.accesses(expectedAddr);
@@ -149,9 +165,11 @@ contract Predeploys is Script {
         {
             console.log("Deploying Safe v1.3");
             address contractAddress = Safe1_3Address;
-            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(Safe1_3CreationBytecode, Safe1_3Salt, Safe1_3Address);
+            (bytes memory contractCode, bytes32[] memory contractWriteSlots) =
+                deployContractViaCreate2(Safe1_3CreationBytecode, Safe1_3Salt, Safe1_3Address);
             console.log("Contract deployed at:", contractAddress);
-            string memory contractJson = addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
             vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
         }
 
@@ -161,9 +179,11 @@ contract Predeploys is Script {
         {
             console.log("Deploying SafeL2 v1.3");
             address contractAddress = SafeL21_3Address;
-            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(SafeL21_3CreationBytecode, SafeL21_3Salt, SafeL21_3Address);
+            (bytes memory contractCode, bytes32[] memory contractWriteSlots) =
+                deployContractViaCreate2(SafeL21_3CreationBytecode, SafeL21_3Salt, SafeL21_3Address);
             console.log("Contract deployed at:", contractAddress);
-            string memory contractJson = addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
             vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
         }
 
@@ -173,9 +193,11 @@ contract Predeploys is Script {
         {
             console.log("Deploying Multisend v1.3");
             address contractAddress = Multisend1_3Address;
-            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(Multisend1_3CreationBytecode, Multisend1_3Salt, Multisend1_3Address);
+            (bytes memory contractCode, bytes32[] memory contractWriteSlots) =
+                deployContractViaCreate2(Multisend1_3CreationBytecode, Multisend1_3Salt, Multisend1_3Address);
             console.log("Contract deployed at:", contractAddress);
-            string memory contractJson = addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
             vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
         }
 
@@ -185,9 +207,12 @@ contract Predeploys is Script {
         {
             console.log("Deploying MultisendCallOnly v1.3");
             address contractAddress = MultisendCallOnly1_3Address;
-            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(MultisendCallOnly1_3CreationBytecode, MultisendCallOnly1_3Salt, MultisendCallOnly1_3Address);
+            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(
+                MultisendCallOnly1_3CreationBytecode, MultisendCallOnly1_3Salt, MultisendCallOnly1_3Address
+            );
             console.log("Contract deployed at:", contractAddress);
-            string memory contractJson = addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
             vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
         }
 
@@ -197,9 +222,12 @@ contract Predeploys is Script {
         {
             console.log("Deploying Safe Singleton Factory");
             address contractAddress = SafeSingletonFactoryAddress;
-            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate(SafeSingletonFactoryCreationBytecode, SafeSingletonFactoryDeployerAddress, SafeSingletonFactoryAddress);
+            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate(
+                SafeSingletonFactoryCreationBytecode, SafeSingletonFactoryDeployerAddress, SafeSingletonFactoryAddress
+            );
             console.log("Contract deployed at:", contractAddress);
-            string memory contractJson = addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
             vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
         }
 
@@ -209,9 +237,11 @@ contract Predeploys is Script {
         {
             console.log("Deploying Multicall3");
             address contractAddress = MultiCall3Address;
-            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaSignedTransaction(MultiCall3Tx, MultiCall3Address);
+            (bytes memory contractCode, bytes32[] memory contractWriteSlots) =
+                deployContractViaSignedTransaction(MultiCall3Tx, MultiCall3Address);
             console.log("Contract deployed at:", contractAddress);
-            string memory contractJson = addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
             vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
         }
 
@@ -222,13 +252,15 @@ contract Predeploys is Script {
         {
             console.log("Deploying Create2Deployer");
             address contractAddress = Create2DeployerAddress;
-            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate(Create2DeployerCreationBytecode, Create2DeployerDeployerAddress, Create2DeployerAddress);
+            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate(
+                Create2DeployerCreationBytecode, Create2DeployerDeployerAddress, Create2DeployerAddress
+            );
 
             // Renouncing ownership
             console.log("Renouncing ownership of Create2Deployer");
             vm.record();
             vm.broadcast(Create2DeployerDeployerAddress);
-            (bool success, ) = Create2DeployerAddress.call(abi.encodeWithSignature("renounceOwnership()"));
+            (bool success,) = Create2DeployerAddress.call(abi.encodeWithSignature("renounceOwnership()"));
             vm.stopRecord();
             require(success, "Renouncing ownership failed");
             (, bytes32[] memory renounceWriteSlots) = vm.accesses(Create2DeployerAddress);
@@ -237,10 +269,10 @@ contract Predeploys is Script {
             // Note: we don't really need to merge since the slot that is modified is the same,
             // but this is to keep the output consistent
             bytes32[] memory mergedWriteSlots = new bytes32[](contractWriteSlots.length + renounceWriteSlots.length);
-            for (uint i = 0; i < contractWriteSlots.length; i++) {
+            for (uint256 i = 0; i < contractWriteSlots.length; i++) {
                 mergedWriteSlots[i] = contractWriteSlots[i];
             }
-            for (uint j = 0; j < renounceWriteSlots.length; j++) {
+            for (uint256 j = 0; j < renounceWriteSlots.length; j++) {
                 mergedWriteSlots[contractWriteSlots.length + j] = renounceWriteSlots[j];
             }
 
@@ -255,9 +287,11 @@ contract Predeploys is Script {
         {
             console.log("Deploying CreateX");
             address contractAddress = CreateXAddress;
-            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaSignedTransaction(CreateXTx, CreateXAddress);
+            (bytes memory contractCode, bytes32[] memory contractWriteSlots) =
+                deployContractViaSignedTransaction(CreateXTx, CreateXAddress);
             console.log("Contract deployed at:", contractAddress);
-            string memory contractJson = addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
             vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
         }
 
@@ -270,10 +304,14 @@ contract Predeploys is Script {
             console.log("Checking Arachnid's Deterministic Deployment Proxy");
             address contractAddress = ArachnidsAddress;
             bytes memory contractCode = contractAddress.code;
-            require(keccak256(contractCode) == keccak256(ArachnidsExpectedRuntimeBytecode), "Arachnid's Proxy bytecode mismatch");
+            require(
+                keccak256(contractCode) == keccak256(ArachnidsExpectedRuntimeBytecode),
+                "Arachnid's Proxy bytecode mismatch"
+            );
             bytes32[] memory contractWriteSlots = new bytes32[](0);
             console.log("Contract deployed at:", contractAddress);
-            string memory contractJson = addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
             vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
         }
 
@@ -283,9 +321,11 @@ contract Predeploys is Script {
         {
             console.log("Deploying Permit2");
             address contractAddress = Permit2Address;
-            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(Permit2CreationBytecode, Permit2Salt, Permit2Address);
+            (bytes memory contractCode, bytes32[] memory contractWriteSlots) =
+                deployContractViaCreate2(Permit2CreationBytecode, Permit2Salt, Permit2Address);
             console.log("Contract deployed at:", contractAddress);
-            string memory contractJson = addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
             vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
         }
 
@@ -295,9 +335,12 @@ contract Predeploys is Script {
         {
             console.log("Deploying EAS SchemaRegistry v1.4.0");
             address contractAddress = EASSchemaRegistryAddress;
-            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(EASSchemaRegistryCreationBytecode, EASSchemaRegistrySalt, EASSchemaRegistryAddress);
+            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(
+                EASSchemaRegistryCreationBytecode, EASSchemaRegistrySalt, EASSchemaRegistryAddress
+            );
             console.log("Contract deployed at:", contractAddress);
-            string memory contractJson = addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
             vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
         }
 
@@ -311,9 +354,11 @@ contract Predeploys is Script {
                 EASCreationBytecode,
                 abi.encode(EASSchemaRegistryAddress) // Constructor argument: SchemaRegistry address
             );
-            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(easCreationBytecode, EASSalt, EASAddress);
+            (bytes memory contractCode, bytes32[] memory contractWriteSlots) =
+                deployContractViaCreate2(easCreationBytecode, EASSalt, EASAddress);
             console.log("Contract deployed at:", contractAddress);
-            string memory contractJson = addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
             vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
         }
 
@@ -323,9 +368,12 @@ contract Predeploys is Script {
         {
             console.log("Deploying ERC-4337 Entrypoint v0.6.0");
             address contractAddress = ERC4337_Entrypoint0_6_0Address;
-            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(ERC4337_Entrypoint0_6_0CreationBytecode, ERC4337_Entrypoint0_6_0Salt, ERC4337_Entrypoint0_6_0Address);
+            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(
+                ERC4337_Entrypoint0_6_0CreationBytecode, ERC4337_Entrypoint0_6_0Salt, ERC4337_Entrypoint0_6_0Address
+            );
             console.log("Contract deployed at:", contractAddress);
-            string memory contractJson = addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
             vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
         }
 
@@ -338,10 +386,14 @@ contract Predeploys is Script {
             console.log("Checking ERC-4337 SenderCreator v0.6.0");
             address contractAddress = ERC4337_SenderCreator0_6_0Address;
             bytes memory contractCode = contractAddress.code;
-            require(keccak256(contractCode) == keccak256(ERC4337_SenderCreator0_6_0ExpectedRuntimeBytecode), "ERC-4337 SenderCreator bytecode mismatch");
+            require(
+                keccak256(contractCode) == keccak256(ERC4337_SenderCreator0_6_0ExpectedRuntimeBytecode),
+                "ERC-4337 SenderCreator bytecode mismatch"
+            );
             bytes32[] memory contractWriteSlots = new bytes32[](0);
             console.log("Contract deployed at:", contractAddress);
-            string memory contractJson = addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
             vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
         }
 
@@ -351,9 +403,12 @@ contract Predeploys is Script {
         {
             console.log("Deploying ERC-4337 Entrypoint v0.7.0");
             address contractAddress = ERC4337_Entrypoint0_7_0Address;
-            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(ERC4337_Entrypoint0_7_0CreationBytecode, ERC4337_Entrypoint0_7_0Salt, ERC4337_Entrypoint0_7_0Address);
+            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(
+                ERC4337_Entrypoint0_7_0CreationBytecode, ERC4337_Entrypoint0_7_0Salt, ERC4337_Entrypoint0_7_0Address
+            );
             console.log("Contract deployed at:", contractAddress);
-            string memory contractJson = addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
             vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
         }
 
@@ -366,10 +421,14 @@ contract Predeploys is Script {
             console.log("Checking ERC-4337 SenderCreator v0.7.0");
             address contractAddress = ERC4337_SenderCreator0_7_0Address;
             bytes memory contractCode = contractAddress.code;
-            require(keccak256(contractCode) == keccak256(ERC4337_SenderCreator0_7_0ExpectedRuntimeBytecode), "ERC-4337 SenderCreator bytecode mismatch");
+            require(
+                keccak256(contractCode) == keccak256(ERC4337_SenderCreator0_7_0ExpectedRuntimeBytecode),
+                "ERC-4337 SenderCreator bytecode mismatch"
+            );
             bytes32[] memory contractWriteSlots = new bytes32[](0);
             console.log("Contract deployed at:", contractAddress);
-            string memory contractJson = addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
             vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
         }
 
@@ -379,9 +438,12 @@ contract Predeploys is Script {
         {
             console.log("Deploying ERC-4337 Entrypoint v0.8.0");
             address contractAddress = ERC4337_Entrypoint0_8_0Address;
-            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(ERC4337_Entrypoint0_8_0CreationBytecode, ERC4337_Entrypoint0_8_0Salt, ERC4337_Entrypoint0_8_0Address);
+            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(
+                ERC4337_Entrypoint0_8_0CreationBytecode, ERC4337_Entrypoint0_8_0Salt, ERC4337_Entrypoint0_8_0Address
+            );
             console.log("Contract deployed at:", contractAddress);
-            string memory contractJson = addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
             vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
         }
 
@@ -394,10 +456,14 @@ contract Predeploys is Script {
             console.log("Checking ERC-4337 SenderCreator v0.8.0");
             address contractAddress = ERC4337_SenderCreator0_8_0Address;
             bytes memory contractCode = contractAddress.code;
-            require(keccak256(contractCode) == keccak256(ERC4337_SenderCreator0_8_0ExpectedRuntimeBytecode), "ERC-4337 SenderCreator bytecode mismatch");
+            require(
+                keccak256(contractCode) == keccak256(ERC4337_SenderCreator0_8_0ExpectedRuntimeBytecode),
+                "ERC-4337 SenderCreator bytecode mismatch"
+            );
             bytes32[] memory contractWriteSlots = new bytes32[](0);
             console.log("Contract deployed at:", contractAddress);
-            string memory contractJson = addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
             vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
         }
 
@@ -407,9 +473,12 @@ contract Predeploys is Script {
         {
             console.log("Deploying ERC-4337 Safe Module Setup v0.3.0");
             address contractAddress = SafeModuleSetup0_3_0Address;
-            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(SafeModuleSetup0_3_0CreationBytecode, SafeModuleSetup0_3_0Salt, SafeModuleSetup0_3_0Address);
+            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(
+                SafeModuleSetup0_3_0CreationBytecode, SafeModuleSetup0_3_0Salt, SafeModuleSetup0_3_0Address
+            );
             console.log("Contract deployed at:", contractAddress);
-            string memory contractJson = addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
             vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
         }
 
@@ -423,13 +492,18 @@ contract Predeploys is Script {
                 Safe4337Module0_3_0Entrypoint0_7_0CreationBytecode,
                 abi.encode(ERC4337_Entrypoint0_7_0Address) // Constructor argument: entrypoint address
             );
-            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(safe4337ModuleEntrypoint0_7_0CreationBytecode, Safe4337Module0_3_0Entrypoint0_7_0Salt, Safe4337Module0_3_0Entrypoint0_7_0Address);
+            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(
+                safe4337ModuleEntrypoint0_7_0CreationBytecode,
+                Safe4337Module0_3_0Entrypoint0_7_0Salt,
+                Safe4337Module0_3_0Entrypoint0_7_0Address
+            );
             console.log("Contract deployed at:", contractAddress);
-            string memory contractJson = addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
             vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
         }
 
-        // 
+        //
         // Kernel v3.3 (supporting Entrypoint v0.7.0) (via CREATE2)
         // --------------------------------------------------------
         {
@@ -439,9 +513,12 @@ contract Predeploys is Script {
                 Kernel_Entrypoint0_7_0CreationBytecode,
                 abi.encode(ERC4337_Entrypoint0_7_0Address) // Constructor argument: entrypoint address
             );
-            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(kernel_Entrypoint0_7_0CreationBytecode, Kernel_Entrypoint0_7_0Salt, Kernel_Entrypoint0_7_0Address);
+            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(
+                kernel_Entrypoint0_7_0CreationBytecode, Kernel_Entrypoint0_7_0Salt, Kernel_Entrypoint0_7_0Address
+            );
             console.log("Contract deployed at:", contractAddress);
-            string memory contractJson = addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
             vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
         }
 
@@ -455,9 +532,14 @@ contract Predeploys is Script {
                 KernelFactory_Entrypoint0_7_0CreationBytecode,
                 abi.encode(Kernel_Entrypoint0_7_0Address) // Constructor argument: entrypoint address
             );
-            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(kernelFactory_Entrypoint0_7_0CreationBytecode, KernelFactory_Entrypoint0_7_0Salt, KernelFactory_Entrypoint0_7_0Address);
+            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(
+                kernelFactory_Entrypoint0_7_0CreationBytecode,
+                KernelFactory_Entrypoint0_7_0Salt,
+                KernelFactory_Entrypoint0_7_0Address
+            );
             console.log("Contract deployed at:", contractAddress);
-            string memory contractJson = addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
             vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
         }
 
@@ -471,9 +553,12 @@ contract Predeploys is Script {
                 KernelFactoryStakerCreationBytecode,
                 abi.encode(KernelFactoryStakerOwnerAddress) // Constructor argument: owner of the factories
             );
-            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(kernelFactoryStakerCreationBytecode, KernelFactoryStakerSalt, KernelFactoryStakerAddress);
+            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(
+                kernelFactoryStakerCreationBytecode, KernelFactoryStakerSalt, KernelFactoryStakerAddress
+            );
             console.log("Contract deployed at:", contractAddress);
-            string memory contractJson = addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
             vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
         }
 
@@ -483,16 +568,33 @@ contract Predeploys is Script {
         {
             console.log("Deploying Kernel ECDSAValidator v3.1");
             address contractAddress = KernelECDSAValidatorAddress;
-            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(KernelECDSAValidatorCreationBytecode, KernelECDSAValidatorSalt, KernelECDSAValidatorAddress);
+            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(
+                KernelECDSAValidatorCreationBytecode, KernelECDSAValidatorSalt, KernelECDSAValidatorAddress
+            );
             console.log("Contract deployed at:", contractAddress);
-            string memory contractJson = addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
             genesisAllocJson = vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
         }
 
         // Form the rest of the JSON structure
         string memory genesisJson = "genesisJson";
         uint256 chainId = block.chainid;
-        vm.serializeString(genesisJson, "config", string.concat('{"chainId":', vm.toString(chainId), ',"homesteadBlock":0,"daoForkBlock":null,"daoForkSupport":true,"eip150Block":0,"eip150Hash":"0x0000000000000000000000000000000000000000000000000000000000000000","eip155Block":0,"eip158Block":0,"byzantiumBlock":0,"constantinopleBlock":0,"petersburgBlock":0,"istanbulBlock":0,"muirGlacierBlock":0,"berlinBlock":0,"londonBlock":0,"clique":{"period":0,"epoch":0},"arbitrum":{"EnableArbOS":true,"AllowDebugPrecompiles":false,"DataAvailabilityCommittee":', vm.toString(isAnyTrust), ',"InitialArbOSVersion":', vm.toString(arbOSVersion), ',"InitialChainOwner":"', vm.toString(chainOwner), '","GenesisBlockNum":0,"MaxCodeSize":24576,"MaxInitCodeSize":49152}}'));
+        vm.serializeString(
+            genesisJson,
+            "config",
+            string.concat(
+                '{"chainId":',
+                vm.toString(chainId),
+                ',"homesteadBlock":0,"daoForkBlock":null,"daoForkSupport":true,"eip150Block":0,"eip150Hash":"0x0000000000000000000000000000000000000000000000000000000000000000","eip155Block":0,"eip158Block":0,"byzantiumBlock":0,"constantinopleBlock":0,"petersburgBlock":0,"istanbulBlock":0,"muirGlacierBlock":0,"berlinBlock":0,"londonBlock":0,"clique":{"period":0,"epoch":0},"arbitrum":{"EnableArbOS":true,"AllowDebugPrecompiles":false,"DataAvailabilityCommittee":',
+                vm.toString(isAnyTrust),
+                ',"InitialArbOSVersion":',
+                vm.toString(arbOSVersion),
+                ',"InitialChainOwner":"',
+                vm.toString(chainOwner),
+                '","GenesisBlockNum":0,"MaxCodeSize":24576,"MaxInitCodeSize":49152}}'
+            )
+        );
         vm.serializeString(genesisJson, "nonce", "0x0");
         vm.serializeString(genesisJson, "timestamp", "0x0");
         vm.serializeString(genesisJson, "extraData", "0x");
@@ -501,7 +603,7 @@ contract Predeploys is Script {
         vm.serializeString(genesisJson, "mixHash", "0x0000000000000000000000000000000000000000000000000000000000000000");
         vm.serializeString(genesisJson, "coinbase", "0x0000000000000000000000000000000000000000");
         genesisJson = vm.serializeString(genesisJson, "alloc", genesisAllocJson);
-        
+
         // Write the JSON output to file
         genesisJson.write(jsonOutPath);
         console.log("Wrote runtime bytecode to", jsonOutPath);
