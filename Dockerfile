@@ -8,8 +8,8 @@ COPY . .
 # Copy environment variables file
 COPY .env.example .env
 
-# Create genesis output directory
-RUN mkdir genesis
+# Create genesis output directory if it doesn't exist
+RUN mkdir -p genesis
 
 # Execute generate script
 ENTRYPOINT ["./generate.sh"]
