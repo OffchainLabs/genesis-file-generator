@@ -1,17 +1,17 @@
 services:
-  genesis-deployer:
+  genesis-file-generator:
     build: .
-    container_name: genesis-deployer
+    container_name: genesis-file-generator
     env_file: .env
     volumes:
       - genesis:/app/genesis
 
-  genesis-generator:
+  genesis-hash-calculator:
     depends_on:
-      genesis-deployer:
+      genesis-file-generator:
         condition: service_completed_successfully
     image: "${NITRO_NODE_IMAGE}"
-    container_name: genesis-generator
+    container_name: genesis-hash-calculator
     entrypoint: ["genesis-generator"]
     volumes:
       - genesis:/data/genesisDir

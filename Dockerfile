@@ -10,6 +10,7 @@ COPY .env.example .env
 
 # Create genesis output directory if it doesn't exist
 RUN mkdir -p genesis
+RUN chown -R foundry:foundry genesis
 
 # Execute generate script
 ENTRYPOINT ["./generate.sh"]
