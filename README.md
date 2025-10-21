@@ -27,7 +27,7 @@ Run the script
 
 The script will output two artifacts:
 
-- A genesis.json file in `out/genesis.json`
+- A genesis.json file in `genesis/genesis.json`
 - The genesis blockhash and sendRoot in the output of the script. For example:
     ```shell
     BlockHash: 0xc8718e3eb62b1fab6ce0ee050385a545c21423a3b164a91545ad9e097fbd5341, SendRoot: 0xac8636f211d5a9a31ca310b8061eb2696d875ee2fa90f903d913677b1f027aed

@@ -5,10 +5,12 @@
 # or if there's a pipe failure
 set -euo pipefail
 
-# Load variables from .env file
+# Load variables from .env file (allowing overrides from CLI)
+currentEnvs=$(declare -p -x)
 set -o allexport
 source .env
 set +o allexport
+eval "$currentEnvs"
 
 # Ensure env variables are set
 if [ -z "$CHAIN_ID" ] || [ -z "$L1_BASE_FEE" ] || [ -z "$NITRO_NODE_IMAGE" ]; then
@@ -16,11 +18,10 @@ if [ -z "$CHAIN_ID" ] || [ -z "$L1_BASE_FEE" ] || [ -z "$NITRO_NODE_IMAGE" ]; th
   exit 1
 fi
 
-# Run the script
+# Run the script (without printing any standard output)
 forge script script/Predeploys.s.sol:Predeploys \
-  --chain-id $CHAIN_ID
+  --chain-id $CHAIN_ID \
+  > /dev/null
 
-# Run the genesis generator on nitro
-docker run -v $(pwd)/genesis:/data/genesisDir --entrypoint genesis-generator $NITRO_NODE_IMAGE --genesis-json-file /data/genesisDir/genesis.json --initial-l1-base-fee $L1_BASE_FEE
-
-echo "Done!"
+# Output the generated genesis file
+cat genesis/genesis.json

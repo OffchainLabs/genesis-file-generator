@@ -1,0 +1,23 @@
+services:
+  genesis-deployer:
+    build: .
+    container_name: genesis-deployer
+    env_file: .env
+    volumes:
+      - genesis:/app/genesis
+
+  genesis-generator:
+    depends_on:
+      genesis-deployer:
+        condition: service_completed_successfully
+    image: "${NITRO_NODE_IMAGE}"
+    container_name: genesis-generator
+    entrypoint: ["genesis-generator"]
+    volumes:
+      - genesis:/data/genesisDir
+    command:
+      - --genesis-json-file=/data/genesisDir/genesis.json
+      - --initial-l1-base-fee=${L1_BASE_FEE}
+
+volumes:
+  genesis:
