@@ -31,9 +31,12 @@ contract Predeploys is Script {
 
         // Deal funds to deployer accounts
         vm.deal(deployer, 1 ether);
-        vm.deal(Multicall3DeployerAddress, 1 ether);
-        vm.deal(CreateXDeployerAddress, 1 ether);
-        vm.deal(ArachnidsDeployerAddress, 1 ether);
+        vm.deal(Multicall3DeployerAddress, 0.1 ether);
+        vm.deal(CreateXDeployerAddress, 0.5 ether);
+        vm.deal(ArachnidsDeployerAddress, 0.1 ether);
+        vm.deal(ZoltuDeployerAddress, 0.1 ether);
+        vm.deal(SingletonFactoryDeployerAddress, 0.1 ether);
+        vm.deal(ERC1820RegistryDeployerAddress, 0.1 ether);
     }
 
     /// @notice Adds predeploy information to a JSON object
@@ -520,6 +523,48 @@ contract Predeploys is Script {
                 "Arachnid's Proxy bytecode mismatch"
             );
             bytes32[] memory contractWriteSlots = new bytes32[](0);
+            console.log("Contract deployed at:", contractAddress);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
+        }
+
+        // ---------------------------------------------------------------
+        // Zoltu's Deterministic Deployment Proxy (via signed transaction)
+        // ---------------------------------------------------------------
+        {
+            console.log("Deploying Zoltu's Proxy");
+            address contractAddress = ZoltuAddress;
+            (bytes memory contractCode, bytes32[] memory contractWriteSlots) =
+                deployContractViaSignedTransaction(ZoltuTx, ZoltuAddress);
+            console.log("Contract deployed at:", contractAddress);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
+        }
+
+        // ----------------------------------------------------
+        // ERC-2470: Singleton Factory (via signed transaction)
+        // ----------------------------------------------------
+        {
+            console.log("Deploying ERC-2470 Singleton Factory");
+            address contractAddress = SingletonFactoryAddress;
+            (bytes memory contractCode, bytes32[] memory contractWriteSlots) =
+                deployContractViaSignedTransaction(SingletonFactoryTx, SingletonFactoryAddress);
+            console.log("Contract deployed at:", contractAddress);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
+        }
+
+        // -------------------------------------------------------------------------
+        // ERC-1820: Pseudo-introspection Registry Contract (via signed transaction)
+        // -------------------------------------------------------------------------
+        {
+            console.log("Deploying ERC-1820 Pseudo-introspection Registry Contract");
+            address contractAddress = ERC1820RegistryAddress;
+            (bytes memory contractCode, bytes32[] memory contractWriteSlots) =
+                deployContractViaSignedTransaction(ERC1820RegistryTx, ERC1820RegistryAddress);
             console.log("Contract deployed at:", contractAddress);
             string memory contractJson =
                 addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
