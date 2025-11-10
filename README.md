@@ -41,6 +41,12 @@ This tool uses a Foundry script to deploy all contracts to the local chain creat
 - `CREATE`
 - Pre-signed transaction
 
+### A note about storage accesses
+
+When deploying a new contract, this script uses [vm.record](https://getfoundry.sh/reference/cheatcodes/record/) and [vm.accesses](https://getfoundry.sh/reference/cheatcodes/accesses) to get the storage slots that were written during the deployment operation. However, only the storage slots accessed on the deployed contract address are read.
+
+If accesses to storage slots of any other address is needed in the future, `vm.record` and `vm.accesses` can be replaced by [vm.startStateDiffRecording](https://getfoundry.sh/reference/cheatcodes/start-state-diff-recording) and [vm.stopAndReturnStateDiff](https://getfoundry.sh/reference/cheatcodes/stop-and-return-state-diff), which return a more comprehensive diff.
+
 ## Pre-deployed contracts
 
 This section lists the contracts that are pre-deployed (i.e., loaded into state at genesis).
