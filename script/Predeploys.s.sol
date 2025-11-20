@@ -803,7 +803,7 @@ contract Predeploys is Script {
                 vm.toString(arbOSVersion),
                 ',"InitialChainOwner":"',
                 vm.toString(chainOwner),
-                '","GenesisBlockNum":0,"MaxCodeSize":24576,"MaxInitCodeSize":49152}}'
+                '","GenesisBlockNum":0}}'
             )
         );
         vm.serializeString(genesisJson, "nonce", "0x0");
