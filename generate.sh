@@ -23,5 +23,23 @@ forge script script/Predeploys.s.sol:Predeploys \
   --chain-id $CHAIN_ID \
   > /dev/null
 
+# Minify the chainConfig property in the generated genesis file
+# NOTE: we need to minify the chainConfig because nitro will use it to obtain the genesis blockhash,
+# and if there are any unnecessary whitespaces, the blockhash will be different from what is found on-chain.
+PLACEHOLDER="__CONFIG_MINIFIED__"
+GENESIS_FILE="genesis/genesis.json"
+config_minified=$(jq -c '.config' "$GENESIS_FILE")
+
+# Set the placeholder in the chainConfig property and save the result
+tmp=$(mktemp)
+jq --arg ph "$PLACEHOLDER" '.config = $ph' "$GENESIS_FILE" | jq '.' > "$tmp"
+
+# Replace the placeholder with the minified config
+awk -v ph="\"$PLACEHOLDER\"" -v rep="$config_minified" '
+  { sub(ph, rep); print }
+' "$tmp" > "$GENESIS_FILE"
+
+rm "$tmp"
+
 # Output the generated genesis file
 cat genesis/genesis.json
