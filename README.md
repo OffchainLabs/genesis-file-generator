@@ -79,6 +79,9 @@ This section lists the contracts that are pre-deployed (i.e., loaded into state 
 - [Create2Deployer](#create2deployer)
 - [CreateX](#createx)
 - [Arachnid's Deterministic Deployment Proxy](#arachnids-deterministic-deployment-proxy)
+- [Zoltu's Deterministic Deployment Proxy](#zoltus-deterministic-deployment-proxy)
+- [ERC-2470: Singleton Factory](#erc-2470-singleton-factory)
+- [ERC-1820: Pseudo-introspection Registry Contract](#erc-1820-pseudo-introspection-registry-contract)
 - [Permit2](#permit2)
 - [EAS SchemaRegistry v1.4.0](#eas-schemaregistry-v140)
 - [EAS v1.4.0](#eas-v140)
@@ -367,6 +370,64 @@ Removing the creation component, `0x604580600e600039806000f350fe`, we are left w
 Alternative, the runtime bytecode can be verified in any block explorer, for example, in [Arbiscan](https://arbiscan.io/address/0x4e59b44847b379578588920cA78FbF26c0B4956C#code).
 
 The target address can be verified in the project's [repository](https://github.com/Arachnid/deterministic-deployment-proxy/tree/99f24d0e09d8fad7ddb5cd37333e92a8956c9783#latest-outputs).
+
+### Zoltu's Deterministic Deployment Proxy
+
+Deployed at `0x7A0D94F55792C434d74a40883C6ed8545E406D12` using a pre-signed transaction.
+
+Source code available at https://github.com/Zoltu/deterministic-deployment-proxy/blob/v1.0.0/source/deterministic-deployment-proxy.yul .
+
+#### How to verify the pre-signed transaction, the runtime bytecode and the target address
+
+This contract is compiled with a very old version of solc. To obtain the bytecode, run the following command:
+
+```
+docker run -v .:/sources --rm ethereum/solc:0.5.8 --strict-assembly /sources/src/deterministic-deployment-proxy.yul --optimize-yul
+```
+
+Bytecode:
+
+```
+0x601f80600e600039806000f350fe60003681823780368234f58015156014578182fd5b80825250506014600cf3
+```
+
+Removing the creation component, `0x601f80600e600039806000f350fe`, we are left with the runtime bytecode.
+
+```
+0x60003681823780368234f58015156014578182fd5b80825250506014600cf3
+```
+
+Alternative, the runtime bytecode can be verified in any block explorer, for example, in [Arbiscan](https://arbiscan.io/address/0x7A0D94F55792C434d74a40883C6ed8545E406D12#code).
+
+The pre-signed transaction and the target address can be verified in the project's [repository](https://github.com/Zoltu/deterministic-deployment-proxy/blob/v1.0.0/README.md#latest-outputs).
+
+### ERC-2470: Singleton Factory
+
+Deployed at `0xce0042B868300000d44A59004Da54A005ffdcf9f` using a pre-signed transaction.
+
+Source code available at https://eips.ethereum.org/EIPS/eip-2470#specification .
+
+#### How to verify the pre-signed transaction, the runtime bytecode and the target address
+
+The pre-signed transaction for this contract is available at [the EIP description](https://eips.ethereum.org/EIPS/eip-2470#deployment-transaction).
+
+And the runtime bytecode can be verified in any block explorer, for example, in [Arbiscan](https://arbiscan.io/address/0xce0042B868300000d44A59004Da54A005ffdcf9f#code).
+
+The target address can be verified in [the EIP description](https://eips.ethereum.org/EIPS/eip-2470#factory-contract-address).
+
+### ERC-1820: Pseudo-introspection Registry Contract
+
+Deployed at `0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24` using a pre-signed transaction.
+
+Source code available at https://eips.ethereum.org/EIPS/eip-1820#specification .
+
+#### How to verify the pre-signed transaction, the runtime bytecode and the target address
+
+The pre-signed transaction for this contract is available at [the EIP description](https://eips.ethereum.org/EIPS/eip-1820#deployment-transaction).
+
+And the runtime bytecode can be verified in any block explorer, for example, in [Arbiscan](https://arbiscan.io/address/0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24#code).
+
+The target address can be verified in [the EIP description](https://eips.ethereum.org/EIPS/eip-1820#registry-contract-address).
 
 ### Permit2
 
