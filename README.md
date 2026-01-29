@@ -19,19 +19,86 @@ cp .env.example .env
 > [!NOTE]
 > Make sure you set the correct values of the environment variables for your chain
 
-Run the script
+Prerequisites:
+
+- `forge` (Foundry)
+- `jq`
+- `docker`
+
+Run the script:
 
 ```shell
 ./generate.sh
 ```
 
-The script will output two artifacts:
+## Command Line Options
 
-- A genesis.json file in `genesis/genesis.json`
-- The genesis blockhash and sendRoot in the output of the script. For example:
-    ```shell
-    BlockHash: 0xc8718e3eb62b1fab6ce0ee050385a545c21423a3b164a91545ad9e097fbd5341, SendRoot: 0xac8636f211d5a9a31ca310b8061eb2696d875ee2fa90f903d913677b1f027aed
-    ```
+The `generate.sh` script supports the following optional flags:
+
+| Flag | Description |
+|------|-------------|
+| `--enable-native-token-supply` | Enable `nativeTokenSupplyManagementEnabled` in arbOSInit |
+| `--custom-serializedChainConfig <path>` | Path to a custom serialized chain config JSON file |
+| `--custom-alloc-account-file <path>` | Path to a custom alloc account file for additional predeploys |
+| `--load-default-predeploys` | Load default predeploy contracts (default: true) |
+| `--no-load-default-predeploys` | Skip loading default predeploy contracts |
+| `--help, -h` | Show help message |
+
+### Examples
+
+Generate genesis with native token supply management enabled:
+
+```shell
+./generate.sh --enable-native-token-supply
+```
+
+Generate genesis without default predeploys and with custom alloc:
+
+```shell
+./generate.sh --no-load-default-predeploys --custom-alloc-account-file ./my-alloc.json
+```
+
+Use a custom chain config:
+
+```shell
+./generate.sh --custom-serializedChainConfig ./my-chain-config.json
+```
+
+> [!NOTE]
+> Flags are applied after the Foundry script generates `genesis.json` using `jq` (post-processing step).
+
+### Custom Alloc Account File Format
+
+The `--custom-alloc-account-file` accepts a JSON file with the following format (addresses can be with or without `0x` prefix):
+
+```json
+{
+  "0000000000000000000000000000000000007070": {
+    "balance": "",
+    "nonce": "1",
+    "code": "0x...",
+    "storage": {
+      "0000000000000000000000000000000000000000000000000000000000000404": "..."
+    }
+  }
+}
+```
+
+> [!NOTE]
+> If a custom alloc address conflicts with a default predeploy address, the script will fail with an error.
+
+## Script Output
+
+`./generate.sh` outputs the full `genesis.json` to stdout and then prints the BlockHash and SendRoot.
+
+Example output:
+
+```shell
+BlockHash: 0xc8718e3eb62b1fab6ce0ee050385a545c21423a3b164a91545ad9e097fbd5341, SendRoot: 0xac8636f211d5a9a31ca310b8061eb2696d875ee2fa90f903d913677b1f027aed
+```
+
+> [!NOTE]
+> The script runs Foundry locally and Nitro tooling inside Docker. Custom alloc/config paths are read from the host filesystem; using relative paths under the repo is recommended.
 
 ## How are contracts pre-deployed
 

@@ -15,6 +15,3 @@ RUN mkdir -p genesis
 USER 0
 RUN chown -R foundry:foundry genesis
 USER foundry
-
-# Execute generate script
-ENTRYPOINT ["./generate.sh"]
