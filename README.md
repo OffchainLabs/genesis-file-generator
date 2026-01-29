@@ -53,8 +53,7 @@ The `generate.sh` script supports the following optional flags:
 | `--enable-native-token-supply` | Enable `nativeTokenSupplyManagementEnabled` in arbOSInit |
 | `--custom-serializedChainConfig <path>` | Path to a custom serialized chain config JSON file |
 | `--custom-alloc-account-file <path>` | Path to a custom alloc account file for additional predeploys |
-| `--load-default-predeploys` | Load default predeploy contracts (default: true) |
-| `--no-load-default-predeploys` | Skip loading default predeploy contracts |
+| `--no-load-default-predeploys` | Skip loading default predeploy contracts (default behavior is to load them) |
 | `--help, -h` | Show help message |
 
 ### Examples

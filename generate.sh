@@ -21,7 +21,6 @@ show_help() {
   echo "  --enable-native-token-supply       Enable nativeTokenSupplyManagementEnabled in arbOSInit"
   echo "  --custom-serializedChainConfig     Path to custom serialized chain config JSON file"
   echo "  --custom-alloc-account-file        Path to custom alloc account file for additional predeploys"
-  echo "  --load-default-predeploys          Load default predeploy contracts (default: true)"
   echo "  --no-load-default-predeploys       Skip loading default predeploy contracts"
   echo "  --help, -h                         Show this help message"
   echo ""
@@ -48,10 +47,6 @@ while [[ $# -gt 0 ]]; do
     --custom-alloc-account-file)
       CUSTOM_ALLOC_ACCOUNT_FILE="$2"
       shift 2
-      ;;
-    --load-default-predeploys)
-      LOAD_DEFAULT_PREDEPLOYS=true
-      shift
       ;;
     --no-load-default-predeploys)
       LOAD_DEFAULT_PREDEPLOYS=false

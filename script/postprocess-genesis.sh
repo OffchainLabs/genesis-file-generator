@@ -75,12 +75,14 @@ fi
 
 JQ_CUSTOM_ALLOC_ARG=(--argjson customAlloc null)
 if [ -n "$ALLOC_ABS_PATH" ]; then
-  JQ_CUSTOM_ALLOC_ARG=(--argfile customAlloc "$ALLOC_ABS_PATH")
+  # jq (jqlang/jq) does not support --argfile; use --rawfile + fromjson instead.
+  JQ_CUSTOM_ALLOC_ARG=(--rawfile customAlloc "$ALLOC_ABS_PATH")
 fi
 
 JQ_CONFIG_ARG=(--argjson cfg null)
 if [ -n "$CHAIN_CONFIG_ABS_PATH" ]; then
-  JQ_CONFIG_ARG=(--argfile cfg "$CHAIN_CONFIG_ABS_PATH")
+  # jq (jqlang/jq) does not support --argfile; use --rawfile + fromjson instead.
+  JQ_CONFIG_ARG=(--rawfile cfg "$CHAIN_CONFIG_ABS_PATH")
 fi
 
 JQ_FILTER='
@@ -88,14 +90,15 @@ def normkey:
   ascii_downcase | if startswith("0x") then . else "0x"+. end;
 def normalize_alloc:
   to_entries | map({key:(.key|normkey), value:.value}) | from_entries;
-def parse_cfg($cfg):
-  if $cfg == null then null
-  elif ($cfg|type) == "string" then ($cfg | fromjson)
-  else $cfg end;
+def parse_json($v):
+  if $v == null then null
+  elif ($v|type) == "string" then ($v | fromjson)
+  else $v end;
 def remove_defaults($defaults):
   if $defaults == null or ($defaults|length==0) then .
   else .alloc |= with_entries(
-    select( ($defaults | index(.key|normkey)) | not )
+    (.key|normkey) as $k
+    | select( ($defaults | index($k)) | not )
   )
   end;
 def merge_custom_alloc($custom; $defaults):
@@ -106,12 +109,12 @@ def merge_custom_alloc($custom; $defaults):
     | ($custom | normalize_alloc) as $cust
     | ($alloc | keys) as $ak
     | ($cust | keys) as $ck
-    | ($ck | map(select($ak|index(.)))) as $conflicts
+    | ($ck | map(select(. as $k | ($ak | index($k)) != null))) as $conflicts
     | if ($conflicts|length) > 0 then
         error("Address conflict detected in alloc: " + ($conflicts|join(", ")))
       else
         (if $defaults != null and ($defaults|length>0) then
-            ($ck | map(select($defaults|index(.)))) as $defaultConflicts
+            ($ck | map(select(. as $k | ($defaults | index($k)) != null))) as $defaultConflicts
             | if ($defaultConflicts|length) > 0 then
                 error("Custom alloc conflicts with default predeploy address: " + ($defaultConflicts|join(", ")))
               else .
@@ -122,10 +125,10 @@ def merge_custom_alloc($custom; $defaults):
       end
   end;
 . as $genesis
-| (if $setConfig then .config = (parse_cfg($cfg)) else . end)
+| (if $setConfig then .config = (parse_json($cfg)) else . end)
 | (if $enableNative then .arbOSInit = ((.arbOSInit // {}) + {nativeTokenSupplyManagementEnabled:true}) else . end)
 | (if $dropDefaults then remove_defaults($defaults) else . end)
-| merge_custom_alloc($customAlloc; $defaults)
+| merge_custom_alloc(parse_json($customAlloc); $defaults)
 '
 
 tmp_genesis="genesis/genesis.json.tmp"
