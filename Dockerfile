@@ -1,6 +1,12 @@
 # syntax=docker/dockerfile:1
 FROM ghcr.io/foundry-rs/foundry:v1.4.2
 
+# Install dependencies (jq)
+USER root
+RUN apt-get update && \
+    apt-get install -y jq
+USER foundry
+
 # Copy code into container
 WORKDIR /app
 COPY . .

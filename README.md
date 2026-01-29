@@ -2,6 +2,19 @@
 
 This repository contains a script to generate a genesis.json file and obtain the block hash and sendRoot hash necessary to create an Arbitrum chain with a set of pre-deployed contracts at genesis.
 
+## :exclamation: Important note about the chain config property
+
+The genesis.json file generated in this repository contains the standard information of any regular genesis.json file used on an Ethereum chain. One of the properties of this file is the `config` property, which contains information about the [chain configuration](https://github.com/ethereum/go-ethereum/blob/master/params/config.go#L433). This chain configuration is used as a component to calculate the genesis blockhash of the chain.
+
+When creating an Arbitrum chain with a non-zero genesis state, the chain configuration is used in 2 places:
+
+- When calculating the genesis blockhash, using Nitro's [genesis-generator](https://github.com/OffchainLabs/nitro/blob/master/cmd/genesis-generator/genesis-generator.go) tool
+- When creating the chain through the RollupCreator contract
+
+Upon initialization, Nitro will use the chain configuration set on-chain (on chain creation) with the rest of the information of the genesis.json file, to obtain a genesis blockhash. It will then compare that blockhash with the one generated with Nitro's genesis-generator (which used the chain configuration directly set in the genesis.json file). For both blockhashes to match, the chain configuration must be exactly the same at the string level, including order of fields, potential whitespaces or special characters.
+
+This repository generates a genesis.json file with a minified chain `config` property to match the minified string that is usually sent to the RollupCreator contract. If the genesis.json file is generated with a different tool, special attention must be taken to also minify the `config` property of the file.
+
 ## How to use this repository
 
 Clone the repository
@@ -107,6 +120,12 @@ This tool uses a Foundry script to deploy all contracts to the local chain creat
 - `CREATE2`
 - `CREATE`
 - Pre-signed transaction
+
+### A note about storage accesses
+
+When deploying a new contract, this script uses [vm.record](https://getfoundry.sh/reference/cheatcodes/record/) and [vm.accesses](https://getfoundry.sh/reference/cheatcodes/accesses) to get the storage slots that were written during the deployment operation. However, only the storage slots accessed on the deployed contract address are read.
+
+If accesses to storage slots of any other address is needed in the future, `vm.record` and `vm.accesses` can be replaced by [vm.startStateDiffRecording](https://getfoundry.sh/reference/cheatcodes/start-state-diff-recording) and [vm.stopAndReturnStateDiff](https://getfoundry.sh/reference/cheatcodes/stop-and-return-state-diff), which return a more comprehensive diff.
 
 ## Pre-deployed contracts
 

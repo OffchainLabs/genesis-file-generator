@@ -236,37 +236,7 @@
     }
   },
   "coinbase": "0x0000000000000000000000000000000000000000",
-  "config": {
-    "chainId": 31337,
-    "homesteadBlock": 0,
-    "daoForkBlock": null,
-    "daoForkSupport": true,
-    "eip150Block": 0,
-    "eip150Hash": "0x0000000000000000000000000000000000000000000000000000000000000000",
-    "eip155Block": 0,
-    "eip158Block": 0,
-    "byzantiumBlock": 0,
-    "constantinopleBlock": 0,
-    "petersburgBlock": 0,
-    "istanbulBlock": 0,
-    "muirGlacierBlock": 0,
-    "berlinBlock": 0,
-    "londonBlock": 0,
-    "clique": {
-      "period": 0,
-      "epoch": 0
-    },
-    "arbitrum": {
-      "EnableArbOS": true,
-      "AllowDebugPrecompiles": false,
-      "DataAvailabilityCommittee": false,
-      "InitialArbOSVersion": 40,
-      "InitialChainOwner": "0x3f1Eae7D46d88F08fc2F8ed27FCb2AB183EB2d0E",
-      "GenesisBlockNum": 0,
-      "MaxCodeSize": 24576,
-      "MaxInitCodeSize": 49152
-    }
-  },
+  "config": {"chainId":31337,"homesteadBlock":0,"daoForkBlock":null,"daoForkSupport":true,"eip150Block":0,"eip150Hash":"0x0000000000000000000000000000000000000000000000000000000000000000","eip155Block":0,"eip158Block":0,"byzantiumBlock":0,"constantinopleBlock":0,"petersburgBlock":0,"istanbulBlock":0,"muirGlacierBlock":0,"berlinBlock":0,"londonBlock":0,"clique":{"period":0,"epoch":0},"arbitrum":{"EnableArbOS":true,"AllowDebugPrecompiles":false,"DataAvailabilityCommittee":false,"InitialArbOSVersion":40,"InitialChainOwner":"0x3f1Eae7D46d88F08fc2F8ed27FCb2AB183EB2d0E","GenesisBlockNum":0}},
   "difficulty": "0x1",
   "extraData": "0x",
   "gasLimit": "0x1C9C380",
