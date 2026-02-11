@@ -236,7 +236,7 @@
     }
   },
   "arbOSInit": {
-    "initialL1BaseFee": 100000000
+    "initialL1BaseFee": 1000000000
   },
   "coinbase": "0x0000000000000000000000000000000000000000",
   "difficulty": "0x1",
