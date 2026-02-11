@@ -12,6 +12,21 @@ source .env
 set +o allexport
 eval "$currentEnvs"
 
+# docker --env-file keeps inline comments in values (e.g. "1000  # note"),
+# so we normalize numeric env vars before passing them to forge.
+trim_and_strip_comment() {
+  local raw="$1"
+  raw="${raw%%#*}"
+  raw="${raw#"${raw%%[![:space:]]*}"}"
+  raw="${raw%"${raw##*[![:space:]]}"}"
+  printf "%s" "$raw"
+}
+
+CHAIN_ID="$(trim_and_strip_comment "${CHAIN_ID:-}")"
+ARB_OS_VERSION="$(trim_and_strip_comment "${ARB_OS_VERSION:-}")"
+L1_BASE_FEE="$(trim_and_strip_comment "${L1_BASE_FEE:-}")"
+export CHAIN_ID ARB_OS_VERSION L1_BASE_FEE
+
 # Ensure env variables are set
 if [ -z "$CHAIN_ID" ] || [ -z "$L1_BASE_FEE" ] || [ -z "$NITRO_NODE_IMAGE" ]; then
   echo "Error: Environment variables are not set in .env. You need to set CHAIN_ID, L1_BASE_FEE, and NITRO_NODE_IMAGE."
