@@ -17,7 +17,6 @@ services:
       - genesis:/data/genesisDir
     command:
       - --genesis-json-file=/data/genesisDir/genesis.json
-      - --initial-l1-base-fee=${L1_BASE_FEE}
 
 volumes:
   genesis:

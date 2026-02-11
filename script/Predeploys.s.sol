@@ -793,7 +793,7 @@ contract Predeploys is Script {
         uint256 chainId = block.chainid;
         vm.serializeString(
             genesisJson,
-            "config",
+            "serializedChainConfig",
             string.concat(
                 '{"chainId":',
                 vm.toString(chainId),
@@ -806,6 +806,7 @@ contract Predeploys is Script {
                 '","GenesisBlockNum":0}}'
             )
         );
+        vm.serializeString(genesisJson, "arbOSInit", '{"initialL1BaseFee":100000000}');
         vm.serializeString(genesisJson, "nonce", "0x0");
         vm.serializeString(genesisJson, "timestamp", "0x0");
         vm.serializeString(genesisJson, "extraData", "0x");
