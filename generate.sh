@@ -13,7 +13,7 @@ set +o allexport
 eval "$currentEnvs"
 
 # docker --env-file keeps inline comments in values (e.g. "1000  # note"),
-# so we normalize numeric env vars before passing them to forge.
+# so we normalize env vars before passing them to forge.
 trim_and_strip_comment() {
   local raw="$1"
   raw="${raw%%#*}"
@@ -25,7 +25,9 @@ trim_and_strip_comment() {
 CHAIN_ID="$(trim_and_strip_comment "${CHAIN_ID:-}")"
 ARB_OS_VERSION="$(trim_and_strip_comment "${ARB_OS_VERSION:-}")"
 L1_BASE_FEE="$(trim_and_strip_comment "${L1_BASE_FEE:-}")"
-export CHAIN_ID ARB_OS_VERSION L1_BASE_FEE
+CHAIN_OWNER="$(trim_and_strip_comment "${CHAIN_OWNER:-}")"
+IS_ANYTRUST="$(trim_and_strip_comment "${IS_ANYTRUST:-}")"
+export CHAIN_ID ARB_OS_VERSION L1_BASE_FEE CHAIN_OWNER IS_ANYTRUST
 
 # Ensure env variables are set
 if [ -z "$CHAIN_ID" ] || [ -z "$L1_BASE_FEE" ] || [ -z "$NITRO_NODE_IMAGE" ]; then
