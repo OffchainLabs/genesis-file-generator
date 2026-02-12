@@ -32,19 +32,142 @@ cp .env.example .env
 > [!NOTE]
 > Make sure you set the correct values of the environment variables for your chain
 
-Run the script
+There are three ways to run this tool:
+
+### Option 1: Run locally
+
+Prerequisites: `forge` (Foundry), `jq`
 
 ```shell
 ./generate.sh
 ```
 
-The script will output two artifacts:
+The script outputs the generated `genesis.json` to stdout. You can redirect it to a file:
 
-- A genesis.json file in `genesis/genesis.json`
-- The genesis blockhash and sendRoot in the output of the script. For example:
-    ```shell
-    BlockHash: 0xc8718e3eb62b1fab6ce0ee050385a545c21423a3b164a91545ad9e097fbd5341, SendRoot: 0xac8636f211d5a9a31ca310b8061eb2696d875ee2fa90f903d913677b1f027aed
-    ```
+```shell
+./generate.sh > my-genesis.json
+```
+
+To calculate the BlockHash and SendRoot, run the genesis-generator from the Nitro node image separately:
+
+```shell
+source .env
+docker run --rm \
+  -v "$(pwd)/genesis":/data/genesisDir \
+  --entrypoint genesis-generator \
+  "$NITRO_NODE_IMAGE" \
+  --genesis-json-file /data/genesisDir/genesis.json \
+  --initial-l1-base-fee "$L1_BASE_FEE"
+```
+
+### Option 2: Docker Compose (default flags)
+
+This is the simplest option if you don't need to pass any custom flags:
+
+```shell
+docker compose up
+```
+
+This builds the image, generates the `genesis.json` file, and automatically calculates the BlockHash and SendRoot.
+
+> [!NOTE]
+> `docker compose up` does not support passing custom CLI flags to `generate.sh`. If you need custom flags, use Option 1 or Option 3.
+
+### Option 3: Step-by-step Docker commands (supports custom flags)
+
+Build the image:
+
+```shell
+docker build -t genesis-file-generator .
+```
+
+Run the genesis-file-generator container with optional flags, redirecting the output to a local file:
+
+```shell
+docker run --rm --env-file .env genesis-file-generator [FLAGS] > genesis.json
+```
+
+Calculate the BlockHash and SendRoot:
+
+```shell
+source .env
+docker run --rm \
+  -v "$(pwd)":/data/genesisDir \
+  --entrypoint genesis-generator \
+  "$NITRO_NODE_IMAGE" \
+  --genesis-json-file /data/genesisDir/genesis.json \
+  --initial-l1-base-fee "$L1_BASE_FEE"
+```
+
+## Command Line Options
+
+The `generate.sh` script supports the following optional flags:
+
+| Flag | Description |
+|------|-------------|
+| `--enable-native-token-supply` | Enable `nativeTokenSupplyManagementEnabled` in arbOSInit |
+| `--custom-serializedChainConfig <path>` | Path to a custom serialized chain config JSON file |
+| `--custom-alloc-account-file <path>` | Path to a custom alloc account file for additional predeploys |
+| `--no-load-default-predeploys` | Skip loading default predeploy contracts (default behavior is to load them) |
+| `--help, -h` | Show help message |
+
+### Examples
+
+Generate genesis with native token supply management enabled:
+
+```shell
+./generate.sh --enable-native-token-supply
+```
+
+Generate genesis without default predeploys and with custom alloc:
+
+```shell
+./generate.sh --no-load-default-predeploys --custom-alloc-account-file ./my-alloc.json
+```
+
+Use a custom chain config:
+
+```shell
+./generate.sh --custom-serializedChainConfig ./my-chain-config.json
+```
+
+> [!NOTE]
+> Flags are applied after the Foundry script generates `genesis.json` using `jq` (post-processing step).
+
+### Custom Alloc Account File Format
+
+The `--custom-alloc-account-file` accepts a JSON file with the following format (addresses can be with or without `0x` prefix):
+
+```json
+{
+  "0000000000000000000000000000000000007070": {
+    "balance": "",
+    "nonce": "1",
+    "code": "0x...",
+    "storage": {
+      "0000000000000000000000000000000000000000000000000000000000000404": "..."
+    }
+  }
+}
+```
+
+> [!NOTE]
+> If a custom alloc address conflicts with a default predeploy address, the script will fail with an error.
+
+## Script Output
+
+`./generate.sh` outputs the full `genesis.json` to stdout. The generated file is also saved at `genesis/genesis.json`.
+
+The BlockHash and SendRoot are calculated separately by the `genesis-generator` tool from the Nitro node image (see usage instructions above).
+
+Example genesis-generator output:
+
+```shell
+BlockHash: 0xc8718e3eb62b1fab6ce0ee050385a545c21423a3b164a91545ad9e097fbd5341, SendRoot: 0xac8636f211d5a9a31ca310b8061eb2696d875ee2fa90f903d913677b1f027aed
+```
+
+> [!NOTE]
+> Custom alloc/config paths are read from the host filesystem; using relative paths under the repo is recommended.
 
 ## How are contracts pre-deployed
 
