@@ -32,16 +32,71 @@ cp .env.example .env
 > [!NOTE]
 > Make sure you set the correct values of the environment variables for your chain
 
-Prerequisites:
+There are three ways to run this tool:
 
-- `forge` (Foundry)
-- `jq`
-- `docker`
+### Option 1: Run locally
 
-Run the script:
+Prerequisites: `forge` (Foundry), `jq`
 
 ```shell
 ./generate.sh
+```
+
+The script outputs the generated `genesis.json` to stdout. You can redirect it to a file:
+
+```shell
+./generate.sh > my-genesis.json
+```
+
+To calculate the BlockHash and SendRoot, run the genesis-generator from the Nitro node image separately:
+
+```shell
+source .env
+docker run --rm \
+  -v "$(pwd)/genesis":/data/genesisDir \
+  --entrypoint genesis-generator \
+  "$NITRO_NODE_IMAGE" \
+  --genesis-json-file /data/genesisDir/genesis.json \
+  --initial-l1-base-fee "$L1_BASE_FEE"
+```
+
+### Option 2: Docker Compose (default flags)
+
+This is the simplest option if you don't need to pass any custom flags:
+
+```shell
+docker compose up
+```
+
+This builds the image, generates the `genesis.json` file, and automatically calculates the BlockHash and SendRoot.
+
+> [!NOTE]
+> `docker compose up` does not support passing custom CLI flags to `generate.sh`. If you need custom flags, use Option 1 or Option 3.
+
+### Option 3: Step-by-step Docker commands (supports custom flags)
+
+Build the image:
+
+```shell
+docker build -t genesis-file-generator .
+```
+
+Run the genesis-file-generator container with optional flags, redirecting the output to a local file:
+
+```shell
+docker run --rm --env-file .env genesis-file-generator [FLAGS] > genesis.json
+```
+
+Calculate the BlockHash and SendRoot:
+
+```shell
+source .env
+docker run --rm \
+  -v "$(pwd)":/data/genesisDir \
+  --entrypoint genesis-generator \
+  "$NITRO_NODE_IMAGE" \
+  --genesis-json-file /data/genesisDir/genesis.json \
+  --initial-l1-base-fee "$L1_BASE_FEE"
 ```
 
 ## Command Line Options
@@ -101,16 +156,18 @@ The `--custom-alloc-account-file` accepts a JSON file with the following format 
 
 ## Script Output
 
-`./generate.sh` outputs the full `genesis.json` to stdout and then prints the BlockHash and SendRoot.
+`./generate.sh` outputs the full `genesis.json` to stdout. The generated file is also saved at `genesis/genesis.json`.
 
-Example output:
+The BlockHash and SendRoot are calculated separately by the `genesis-generator` tool from the Nitro node image (see usage instructions above).
+
+Example genesis-generator output:
 
 ```shell
 BlockHash: 0xc8718e3eb62b1fab6ce0ee050385a545c21423a3b164a91545ad9e097fbd5341, SendRoot: 0xac8636f211d5a9a31ca310b8061eb2696d875ee2fa90f903d913677b1f027aed
 ```
 
 > [!NOTE]
-> The script runs Foundry locally and Nitro tooling inside Docker. Custom alloc/config paths are read from the host filesystem; using relative paths under the repo is recommended.
+> Custom alloc/config paths are read from the host filesystem; using relative paths under the repo is recommended.
 
 ## How are contracts pre-deployed
 

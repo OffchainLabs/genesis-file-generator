@@ -77,11 +77,6 @@ if [ -z "$CHAIN_ID" ] || [ -z "$L1_BASE_FEE" ] || [ -z "$NITRO_NODE_IMAGE" ]; th
   exit 1
 fi
 
-if ! command -v docker &> /dev/null; then
-  echo "Error: Docker is required to run this script."
-  exit 1
-fi
-
 if ! command -v forge &> /dev/null; then
   echo "Error: forge is required to run this script."
   exit 1
@@ -119,13 +114,4 @@ awk -v ph="\"$PLACEHOLDER\"" -v rep="$config_minified" '
 rm "$tmp"
 
 # Output the generated genesis file
-echo "Genesis file generated at: genesis/genesis.json"
-# Calculate BlockHash and SendRoot using Nitro's genesis-generator
-echo ""
-echo "Calculating BlockHash and SendRoot..."
-docker run --rm \
-  -v "$(pwd)/genesis:/data/genesisDir" \
-  --entrypoint genesis-generator \
-  "$NITRO_NODE_IMAGE" \
-  --genesis-json-file /data/genesisDir/genesis.json \
-  --initial-l1-base-fee "$L1_BASE_FEE"
+cat genesis/genesis.json
