@@ -13,6 +13,3 @@ docs/
 # Dotenv file
 .env
 
-# Generated genesis artifacts
-genesis/*
-
