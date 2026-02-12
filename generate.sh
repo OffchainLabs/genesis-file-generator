@@ -12,6 +12,23 @@ source .env
 set +o allexport
 eval "$currentEnvs"
 
+# docker --env-file keeps inline comments in values (e.g. "1000  # note"),
+# so we normalize env vars before passing them to forge.
+trim_and_strip_comment() {
+  local raw="$1"
+  raw="${raw%%#*}"
+  raw="${raw#"${raw%%[![:space:]]*}"}"
+  raw="${raw%"${raw##*[![:space:]]}"}"
+  printf "%s" "$raw"
+}
+
+CHAIN_ID="$(trim_and_strip_comment "${CHAIN_ID:-}")"
+ARB_OS_VERSION="$(trim_and_strip_comment "${ARB_OS_VERSION:-}")"
+L1_BASE_FEE="$(trim_and_strip_comment "${L1_BASE_FEE:-}")"
+CHAIN_OWNER="$(trim_and_strip_comment "${CHAIN_OWNER:-}")"
+IS_ANYTRUST="$(trim_and_strip_comment "${IS_ANYTRUST:-}")"
+export CHAIN_ID ARB_OS_VERSION L1_BASE_FEE CHAIN_OWNER IS_ANYTRUST
+
 # Ensure env variables are set
 if [ -z "$CHAIN_ID" ] || [ -z "$L1_BASE_FEE" ] || [ -z "$NITRO_NODE_IMAGE" ]; then
   echo "Error: Environment variables are not set in .env. You need to set CHAIN_ID, L1_BASE_FEE, and NITRO_NODE_IMAGE."
@@ -23,23 +40,21 @@ forge script script/Predeploys.s.sol:Predeploys \
   --chain-id $CHAIN_ID \
   > /dev/null
 
-# Minify the chainConfig property in the generated genesis file
-# NOTE: we need to minify the chainConfig because nitro will use it to obtain the genesis blockhash,
-# and if there are any unnecessary whitespaces, the blockhash will be different from what is found on-chain.
-PLACEHOLDER="__CONFIG_MINIFIED__"
+# Minify serializedChainConfig while keeping it as a JSON string.
+# NOTE: nitro uses this value to derive the genesis block hash, so whitespace differences matter.
 GENESIS_FILE="genesis/genesis.json"
-config_minified=$(jq -c '.config' "$GENESIS_FILE")
-
-# Set the placeholder in the chainConfig property and save the result
 tmp=$(mktemp)
-jq --arg ph "$PLACEHOLDER" '.config = $ph' "$GENESIS_FILE" | jq '.' > "$tmp"
 
-# Replace the placeholder with the minified config
-awk -v ph="\"$PLACEHOLDER\"" -v rep="$config_minified" '
-  { sub(ph, rep); print }
-' "$tmp" > "$GENESIS_FILE"
+jq '
+  .serializedChainConfig |= (
+    if type == "string"
+    then (fromjson | tojson)
+    else tojson
+    end
+  )
+' "$GENESIS_FILE" > "$tmp"
 
-rm "$tmp"
+mv "$tmp" "$GENESIS_FILE"
 
 # Output the generated genesis file
 cat genesis/genesis.json
