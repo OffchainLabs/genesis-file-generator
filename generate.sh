@@ -6,7 +6,6 @@
 set -euo pipefail
 
 # Default values for CLI flags
-ENABLE_NATIVE_TOKEN_SUPPLY=false
 CUSTOM_SERIALIZED_CHAIN_CONFIG=""
 CUSTOM_ALLOC_ACCOUNT_FILE=""
 LOAD_DEFAULT_PREDEPLOYS=true
@@ -18,7 +17,6 @@ show_help() {
   echo "Generate a genesis.json file for an Arbitrum chain with pre-deployed contracts."
   echo ""
   echo "Options:"
-  echo "  --enable-native-token-supply       Enable nativeTokenSupplyManagementEnabled in arbOSInit"
   echo "  --custom-serializedChainConfig     Path to custom serialized chain config JSON file"
   echo "  --custom-alloc-account-file        Path to custom alloc account file for additional predeploys"
   echo "  --no-load-default-predeploys       Skip loading default predeploy contracts"
@@ -30,16 +28,13 @@ show_help() {
   echo "  ARB_OS_VERSION                     ArbOS version to use"
   echo "  CHAIN_OWNER                        Chain owner address"
   echo "  L1_BASE_FEE                        Initial L1 base fee"
+  echo "  ENABLE_NATIVE_TOKEN_SUPPLY         Whether to enable native token supply management in ArbOS (true/false)"
   echo "  NITRO_NODE_IMAGE                   Nitro node Docker image"
 }
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
   case $1 in
-    --enable-native-token-supply)
-      ENABLE_NATIVE_TOKEN_SUPPLY=true
-      shift
-      ;;
     --custom-serializedChainConfig)
       CUSTOM_SERIALIZED_CHAIN_CONFIG="$2"
       shift 2
@@ -105,7 +100,6 @@ mkdir -p genesis
 forge script script/Predeploys.s.sol:Predeploys --chain-id "$CHAIN_ID" > /dev/null
 
 # Post-process genesis.json based on CLI flags
-export ENABLE_NATIVE_TOKEN_SUPPLY
 export LOAD_DEFAULT_PREDEPLOYS
 export CUSTOM_ALLOC_ACCOUNT_FILE
 export CUSTOM_SERIALIZED_CHAIN_CONFIG

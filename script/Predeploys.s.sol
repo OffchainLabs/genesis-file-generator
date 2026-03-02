@@ -20,6 +20,7 @@ contract Predeploys is Script {
     uint256 arbOSVersion;
     address chainOwner;
     uint256 l1BaseFee;
+    bool enableNativeTokenSupplyManagement;
 
     function setUp() public {
         // Load environment variables
@@ -31,6 +32,8 @@ contract Predeploys is Script {
         chainOwner = vm.parseAddress(chainOwnerStr);
         string memory l1BaseFeeStr = vm.envString("L1_BASE_FEE");
         l1BaseFee = vm.parseUint(l1BaseFeeStr);
+        string memory enableNativeTokenSupplyManagementStr = vm.envString("ENABLE_NATIVE_TOKEN_SUPPLY");
+        enableNativeTokenSupplyManagement = (keccak256(abi.encodePacked(enableNativeTokenSupplyManagementStr)) == keccak256(abi.encodePacked("true")));
 
         // Deal funds to deployer accounts
         vm.deal(deployer, 1 ether);
@@ -791,6 +794,15 @@ contract Predeploys is Script {
             genesisAllocJson = vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
         }
 
+        // ArbOS init flags
+        string memory genesisArbOSInit = "genesisArbOSInit";
+
+        if (enableNativeTokenSupplyManagement) {
+            vm.serializeBool(genesisArbOSInit, "nativeTokenSupplyManagementEnabled", true);
+        }
+
+        genesisArbOSInit = vm.serializeUint(genesisArbOSInit, "initialL1BaseFee", l1BaseFee);
+
         // Form the rest of the JSON structure
         string memory genesisJson = "genesisJson";
         uint256 chainId = block.chainid;
@@ -809,7 +821,7 @@ contract Predeploys is Script {
                 '","GenesisBlockNum":0,"MaxCodeSize":24576,"MaxInitCodeSize":49152}}'
             )
         );
-        vm.serializeString(genesisJson, "arbOSInit", string.concat('{"initialL1BaseFee":', vm.toString(l1BaseFee), "}"));
+        vm.serializeString(genesisJson, "arbOSInit", genesisArbOSInit);
         vm.serializeString(genesisJson, "nonce", "0x0");
         vm.serializeString(genesisJson, "timestamp", "0x0");
         vm.serializeString(genesisJson, "extraData", "0x");

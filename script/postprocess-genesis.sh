@@ -51,11 +51,6 @@ if [ "${LOAD_DEFAULT_PREDEPLOYS:-true}" = "false" ]; then
   DROP_DEFAULTS=true
 fi
 
-ENABLE_NATIVE_JSON=false
-if [ "${ENABLE_NATIVE_TOKEN_SUPPLY:-false}" = "true" ]; then
-  ENABLE_NATIVE_JSON=true
-fi
-
 SET_CONFIG=false
 if [ -n "$CHAIN_CONFIG_ABS_PATH" ]; then
   SET_CONFIG=true
@@ -126,14 +121,12 @@ def merge_custom_alloc($custom; $defaults):
   end;
 . as $genesis
 | (if $setConfig then .config = (parse_json($cfg)) else . end)
-| (if $enableNative then .arbOSInit = ((.arbOSInit // {}) + {nativeTokenSupplyManagementEnabled:true}) else . end)
 | (if $dropDefaults then remove_defaults($defaults) else . end)
 | merge_custom_alloc(parse_json($customAlloc); $defaults)
 '
 
 tmp_genesis="genesis/genesis.json.tmp"
 jq \
-  --argjson enableNative "$ENABLE_NATIVE_JSON" \
   --argjson dropDefaults "$DROP_DEFAULTS" \
   --argjson defaults "$DEFAULT_PREDEPLOY_JSON" \
   --argjson setConfig "$SET_CONFIG" \
