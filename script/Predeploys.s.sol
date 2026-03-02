@@ -19,6 +19,7 @@ contract Predeploys is Script {
     bool isAnyTrust;
     uint256 arbOSVersion;
     address chainOwner;
+    uint256 l1BaseFee;
 
     function setUp() public {
         // Load environment variables
@@ -28,6 +29,8 @@ contract Predeploys is Script {
         arbOSVersion = vm.parseUint(arbOSVersionStr);
         string memory chainOwnerStr = vm.envString("CHAIN_OWNER");
         chainOwner = vm.parseAddress(chainOwnerStr);
+        string memory l1BaseFeeStr = vm.envString("L1_BASE_FEE");
+        l1BaseFee = vm.parseUint(l1BaseFeeStr);
 
         // Deal funds to deployer accounts
         vm.deal(deployer, 1 ether);
@@ -793,7 +796,7 @@ contract Predeploys is Script {
         uint256 chainId = block.chainid;
         vm.serializeString(
             genesisJson,
-            "config",
+            "serializedChainConfig",
             string.concat(
                 '{"chainId":',
                 vm.toString(chainId),
@@ -803,9 +806,10 @@ contract Predeploys is Script {
                 vm.toString(arbOSVersion),
                 ',"InitialChainOwner":"',
                 vm.toString(chainOwner),
-                '","GenesisBlockNum":0}}'
+                '","GenesisBlockNum":0,"MaxCodeSize":24576,"MaxInitCodeSize":49152}}'
             )
         );
+        vm.serializeString(genesisJson, "arbOSInit", string.concat('{"initialL1BaseFee":', vm.toString(l1BaseFee), "}"));
         vm.serializeString(genesisJson, "nonce", "0x0");
         vm.serializeString(genesisJson, "timestamp", "0x0");
         vm.serializeString(genesisJson, "extraData", "0x");
