@@ -9,14 +9,6 @@ import "script/Predeploys.s.sol";
 contract GenerateGenesis is Script {
     using stdJson for string;
 
-    // Type for alloc entries
-    struct AllocEntry {
-        uint256 balance;
-        bytes code;
-        uint256 nonce;
-        mapping(bytes32 => bytes32) storageEntries;
-    }
-
     /// @notice Output path for the generated JSON file
     string jsonOutPath = "genesis/genesis.json";
 
@@ -27,8 +19,6 @@ contract GenerateGenesis is Script {
     uint256 l1BaseFee;
     bool enableNativeTokenSupplyManagement;
     bool loadPredeploys;
-    string customAllocFilePathStr;
-    bool loadCustomAllocEntries;
 
     function setUp() public {
         // Load environment variables
@@ -49,9 +39,6 @@ contract GenerateGenesis is Script {
         
         string memory loadPredeploysStr = vm.envString("LOAD_DEFAULT_PREDEPLOYS");
         loadPredeploys = (keccak256(abi.encodePacked(loadPredeploysStr)) == keccak256(abi.encodePacked("true")));
-
-        customAllocFilePathStr = vm.envString("CUSTOM_ALLOC_ACCOUNT_FILE");
-        loadCustomAllocEntries = bytes(customAllocFilePathStr).length > 0;
     }
 
     function run() public {
@@ -64,32 +51,6 @@ contract GenerateGenesis is Script {
         } else {
             genesisAllocJson = "{}";
         }
-
-        // Load additional alloc entries
-        /*
-        if (loadCustomAllocEntries) {
-            // Load file
-            string memory customAllocJson = vm.readFile(customAllocFilePathStr);
-
-            // Get all addresses (keys)
-            string[] memory contractAddresses = vm.parseJsonKeys(customAllocJson, "$");
-
-            // Merge each entry into the genesisAllocJson
-            for (uint256 i = 0; i < contractAddresses.length; i++) {
-                console.log("Processing custom alloc entry for address:", contractAddresses[i]);
-                string memory contractAddress = contractAddresses[i];
-                bytes memory contractJson = vm.parseJson(customAllocJson, contractAddress);
-
-                AllocEntry memory contractInformation = abi.decode(contractJson, (AllocEntry));
-
-                if (i == contractAddresses.length - 1) {
-                    genesisAllocJson = vm.serializeString(genesisAllocJson, contractAddress, vm.toString(contractJson));
-                    break;
-                } else {
-                    vm.serializeString(genesisAllocJson, contractAddress, vm.toString(contractJson));
-                }
-            }
-        } */
 
         // ArbOS init flags
         string memory genesisArbOSInit = "genesisArbOSInit";
