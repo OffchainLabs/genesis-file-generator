@@ -4,16 +4,16 @@ This repository contains a script to generate a genesis.json file and obtain the
 
 ## :exclamation: Important note about the chain config property
 
-The genesis.json file generated in this repository contains the standard information of any regular genesis.json file used on an Ethereum chain. One of the properties of this file is the `config` property, which contains information about the [chain configuration](https://github.com/ethereum/go-ethereum/blob/master/params/config.go#L433). This chain configuration is used as a component to calculate the genesis blockhash of the chain.
+The genesis.json file generated in this repository contains the standard information of any regular genesis.json file used on an Ethereum chain, with the exception of the `config` property, which usually contains information about the [chain configuration](https://github.com/ethereum/go-ethereum/blob/master/params/config.go#L433). In Arbitrum chains, the chain configuration is specified in a `serializedChainConfig` property, which contains the chain configuration (the same used in a regular `config` property) as a serialized JSON string. This serialized chain configuration is used as a component to calculate the genesis blockhash of the chain.
 
 When creating an Arbitrum chain with a non-zero genesis state, the chain configuration is used in 2 places:
 
 - When calculating the genesis blockhash, using Nitro's [genesis-generator](https://github.com/OffchainLabs/nitro/blob/master/cmd/genesis-generator/genesis-generator.go) tool
 - When creating the chain through the RollupCreator contract
 
-Upon initialization, Nitro will use the chain configuration set on-chain (on chain creation) with the rest of the information of the genesis.json file, to obtain a genesis blockhash. It will then compare that blockhash with the one generated with Nitro's genesis-generator (which used the chain configuration directly set in the genesis.json file). For both blockhashes to match, the chain configuration must be exactly the same at the string level, including order of fields, potential whitespaces or special characters.
+Upon initialization, Nitro will use the chain configuration set on-chain (on chain creation) with the rest of the information of the genesis.json file, to obtain a genesis blockhash. It will then compare that blockhash with the one generated with Nitro's genesis-generator (which used the chain configuration directly set in the genesis.json file). For both blockhashes to match, the chain configuration must be exactly the same at the string level, including the order of fields, potential whitespace, or special characters.
 
-This repository generates a genesis.json file with a minified chain `config` property to match the minified string that is usually sent to the RollupCreator contract. If the genesis.json file is generated with a different tool, special attention must be taken to also minify the `config` property of the file.
+This repository generates a genesis.json file with a serialized chain configuration (in `serializedChainConfig`) to match the serialized string that is usually sent to the RollupCreator contract. If the genesis.json file is generated with a different tool, special attention must be paid to also serializing the chain configuration and specifying it in a `serializedChainConfig` property of the file.
 
 ## How to use this repository
 
@@ -23,32 +23,24 @@ Clone the repository
 git clone https://github.com/OffchainLabs/genesis-file-generator.git
 ```
 
-Make a copy of the environment variable and set the necessary values
+Make a copy of the environment variables file and set the necessary values
 
 ```shell
 cp .env.example .env
 ```
 
 > [!NOTE]
-> Make sure you set the correct values of the environment variables for your chain
+> Make sure you set the correct values for the environment variables for your chain
 
-There are three ways to run this tool:
-
-### Option 1: Run locally
-
-Prerequisites: `forge` (Foundry), `jq`
+Run the script (you must have `forge` (Foundry) and `jq` installed)
 
 ```shell
 ./generate.sh
 ```
 
-The script outputs the generated `genesis.json` to stdout. You can redirect it to a file:
+The script will generate a genesis.json file in `genesis/genesis.json`.
 
-```shell
-./generate.sh > my-genesis.json
-```
-
-To calculate the BlockHash and SendRoot, run the genesis-generator from the Nitro node image separately:
+To calculate the BlockHash and SendRoot, run the genesis-generator tool from the Nitro node image separately:
 
 ```shell
 source .env
@@ -60,83 +52,32 @@ docker run --rm \
   --initial-l1-base-fee "$L1_BASE_FEE"
 ```
 
-### Option 2: Docker Compose (default flags)
-
-This is the simplest option if you don't need to pass any custom flags:
+The script will output the genesis blockhash and sendRoot. For example:
 
 ```shell
-docker compose up
+BlockHash: 0xc8718e3eb62b1fab6ce0ee050385a545c21423a3b164a91545ad9e097fbd5341, SendRoot: 0xac8636f211d5a9a31ca310b8061eb2696d875ee2fa90f903d913677b1f027aed
 ```
 
-This builds the image, generates the `genesis.json` file, and automatically calculates the BlockHash and SendRoot.
+## Environment variables
 
-> [!NOTE]
-> `docker compose up` does not support passing custom CLI flags to `generate.sh`. If you need custom flags, use Option 1 or Option 3.
+This tool supports the following environment variables:
 
-### Option 3: Step-by-step Docker commands (supports custom flags)
-
-Build the image:
-
-```shell
-docker build -t genesis-file-generator .
-```
-
-Run the genesis-file-generator container with optional flags, redirecting the output to a local file:
-
-```shell
-docker run --rm --env-file .env genesis-file-generator [FLAGS] > genesis.json
-```
-
-Calculate the BlockHash and SendRoot:
-
-```shell
-source .env
-docker run --rm \
-  -v "$(pwd)":/data/genesisDir \
-  --entrypoint genesis-generator \
-  "$NITRO_NODE_IMAGE" \
-  --genesis-json-file /data/genesisDir/genesis.json \
-  --initial-l1-base-fee "$L1_BASE_FEE"
-```
-
-## Command Line Options
-
-The `generate.sh` script supports the following optional flags:
-
-| Flag | Description |
+| Env variable | Description |
 |------|-------------|
-| `--enable-native-token-supply` | Enable `nativeTokenSupplyManagementEnabled` in arbOSInit |
-| `--custom-serializedChainConfig <path>` | Path to a custom serialized chain config JSON file |
-| `--custom-alloc-account-file <path>` | Path to a custom alloc account file for additional predeploys |
-| `--no-load-default-predeploys` | Skip loading default predeploy contracts (default behavior is to load them) |
-| `--help, -h` | Show help message |
+CHAIN_ID                           | Chain ID for the new chain
+IS_ANYTRUST                        | Whether it's an Anytrust chain (true/false)
+ARBOS_VERSION                      | ArbOS version to use
+CHAIN_OWNER                        | Chain owner address
+L1_BASE_FEE                        | Initial L1 base fee
+ENABLE_NATIVE_TOKEN_SUPPLY         | Whether to enable native token supply management in ArbOS (true/false)
+ENABLE_TRANSACTION_FILTERING       | Whether to enable transaction filtering in ArbOS (true/false)
+NITRO_NODE_IMAGE                   | Nitro node Docker image
+LOAD_DEFAULT_PREDEPLOYS            | Whether to include default predeploys in the genesis file (true/false)
+CUSTOM_ALLOC_ACCOUNT_FILE          | Path to custom alloc account file for additional predeploys (optional)
 
-### Examples
+### Custom alloc file format
 
-Generate genesis with native token supply management enabled:
-
-```shell
-./generate.sh --enable-native-token-supply
-```
-
-Generate genesis without default predeploys and with custom alloc:
-
-```shell
-./generate.sh --no-load-default-predeploys --custom-alloc-account-file ./my-alloc.json
-```
-
-Use a custom chain config:
-
-```shell
-./generate.sh --custom-serializedChainConfig ./my-chain-config.json
-```
-
-> [!NOTE]
-> Flags are applied after the Foundry script generates `genesis.json` using `jq` (post-processing step).
-
-### Custom Alloc Account File Format
-
-The `--custom-alloc-account-file` accepts a JSON file with the following format (addresses can be with or without `0x` prefix):
+The `CUSTOM_ALLOC_ACCOUNT_FILE` environment variable accepts a JSON file with the following format (addresses can be with or without `0x` prefix):
 
 ```json
 {
@@ -152,22 +93,7 @@ The `--custom-alloc-account-file` accepts a JSON file with the following format 
 ```
 
 > [!NOTE]
-> If a custom alloc address conflicts with a default predeploy address, the script will fail with an error.
-
-## Script Output
-
-`./generate.sh` outputs the full `genesis.json` to stdout. The generated file is also saved at `genesis/genesis.json`.
-
-The BlockHash and SendRoot are calculated separately by the `genesis-generator` tool from the Nitro node image (see usage instructions above).
-
-Example genesis-generator output:
-
-```shell
-BlockHash: 0xc8718e3eb62b1fab6ce0ee050385a545c21423a3b164a91545ad9e097fbd5341, SendRoot: 0xac8636f211d5a9a31ca310b8061eb2696d875ee2fa90f903d913677b1f027aed
-```
-
-> [!NOTE]
-> Custom alloc/config paths are read from the host filesystem; using relative paths under the repo is recommended.
+> The information in the custom alloc account file will take precedence over the information of the contracts predeployed by default, so if a custom alloc address conflicts with a default predeploy address, the script will replace the default information with the one in the custom alloc account file.
 
 ## How are contracts pre-deployed
 
@@ -214,7 +140,7 @@ This section lists the contracts that are pre-deployed (i.e., loaded into state 
 - [ERC-4337 Safe Module Setup v0.3.0](#erc-4337-safe-module-setup-v030)
 - [ERC-4337 Safe 4337 Module v0.3.0 (for Entrypoint v0.7.0)](#erc-4337-safe-4337-module-v030-for-entrypoint-v070)
 - [Kernel v3.3 (for Entrypoint v0.7.0)](#kernel-v33-for-entrypoint-v070)
-- [KernelFactory v3.3 (for Entrypoing v0.7.0)](#kernelfactory-v33-for-entrypoing-v070)
+- [KernelFactory v3.3 (for Entrypoint v0.7.0)](#kernelfactory-v33-for-entrypoint-v070)
 - [MetaFactory (FactoryStaker) v3.0](#metafactory-factorystaker-v30)
 - [ECDSAValidator v3.1 (commit 8f7fd99)](#ecdsavalidator-v31-commit-8f7fd99)
 
@@ -224,9 +150,9 @@ Deployed at `0x914d7Fec6aaC8cd542e72Bca78B30650d45643d7` using CREATE from the a
 
 Source code available at https://github.com/safe-global/safe-singleton-factory/blob/v1.0.43/source/deterministic-deployment-proxy.yul .
 
-This contract is a replica of Arachnid's Deterministic Deployment Proxy, that is deployed using a key controlled by the Safe team.
+This contract is a replica of Arachnid's Deterministic Deployment Proxy and is deployed using a key controlled by the Safe team.
 
-To deploy this contract, we need to act as the deployer address and deploy the creation bytecode.
+To deploy this contract, you need to act as the deployer address and deploy the creation bytecode.
 
 #### How to verify the creation bytecode and the target address
 
@@ -242,7 +168,7 @@ Bytecode:
 0x604580600e600039806000f350fe7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe03601600081602082378035828234f58015156039578182fd5b8082525050506014600cf3
 ```
 
-Alternative, the runtime bytecode can be verified in any block explorer, for example, in [Arbiscan](https://arbiscan.io/address/0x914d7Fec6aaC8cd542e72Bca78B30650d45643d7#code).
+Alternatively, the runtime bytecode can be verified in any block explorer, for example, in [Arbiscan](https://arbiscan.io/address/0x914d7Fec6aaC8cd542e72Bca78B30650d45643d7#code).
 
 The target address can be verified in the project's [repository](https://github.com/safe-global/safe-singleton-factory/#expected-addresses).
 
@@ -425,7 +351,7 @@ And the runtime bytecode can be verified by following the build instructions of 
 
 Note that compiling the contract in the repository yields the same bytecode with the exception of the final IPFS metadata hash, which is different than the one that is deployed.
 
-Alternative, the runtime bytecode can be verified in any block explorer, for example, in [Arbiscan](https://arbiscan.io/address/0xcA11bde05977b3631167028862bE2a173976CA11#code).
+Alternatively, the runtime bytecode can be verified in any block explorer, for example, in [Arbiscan](https://arbiscan.io/address/0xcA11bde05977b3631167028862bE2a173976CA11#code).
 
 The target address can be verified in the project's [repository](https://github.com/mds1/multicall3/tree/v3.1.0#multicall3-contract-addresses).
 
@@ -435,7 +361,7 @@ Deployed at `0x13b0D85CcB8bf860b6b79AF3029fCA081AE9beF2` using CREATE from the a
 
 Source code available at https://github.com/pcaversaccio/create2deployer/blob/c7b353935fd9a55110e75fba93bad936db998957/contracts/Create2Deployer.sol .
 
-To deploy this contract, we need to act as the deployer address and deploy the creation bytecode.
+To deploy this contract, you need to act as the deployer address and deploy the creation bytecode.
 
 #### How to verify the creation bytecode and the target address
 
@@ -487,7 +413,7 @@ Removing the creation component, `0x604580600e600039806000f350fe`, we are left w
 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe03601600081602082378035828234f58015156039578182fd5b8082525050506014600cf3
 ```
 
-Alternative, the runtime bytecode can be verified in any block explorer, for example, in [Arbiscan](https://arbiscan.io/address/0x4e59b44847b379578588920cA78FbF26c0B4956C#code).
+Alternatively, the runtime bytecode can be verified in any block explorer, for example, in [Arbiscan](https://arbiscan.io/address/0x4e59b44847b379578588920cA78FbF26c0B4956C#code).
 
 The target address can be verified in the project's [repository](https://github.com/Arachnid/deterministic-deployment-proxy/tree/99f24d0e09d8fad7ddb5cd37333e92a8956c9783#latest-outputs).
 
@@ -609,7 +535,7 @@ Follow the build instructions of the repository and obtain the runtime bytecode 
 
 Note that this contract contains an immutable variable set to the address of the Entrypoint. Thus, the runtime bytecode obtained after compilation will not exactly match. The immutable variable must be set to the right address before comparing it. Additionally, the final IPFS metadata hash obtained when compiling the contract will be different than the one deployed.
 
-Alternative, the runtime bytecode can be verified in any block explorer, for example, in [Arbiscan](https://arbiscan.io/address/0x449ED7C3e6Fee6a97311d4b55475DF59C44AdD33#code).
+Alternatively, the runtime bytecode can be verified in any block explorer, for example, in [Arbiscan](https://arbiscan.io/address/0x449ED7C3e6Fee6a97311d4b55475DF59C44AdD33#code).
 
 ### ERC-4337 Safe Module Setup v0.3.0
 
@@ -655,7 +581,7 @@ FOUNDRY_PROFILE=deploy forge build
 
 The target address can be verified in the project's [repository](https://github.com/zerodevapp/kernel/#addresses).
 
-### KernelFactory v3.3 (for Entrypoing v0.7.0)
+### KernelFactory v3.3 (for Entrypoint v0.7.0)
 
 Deployed at `0x2577507b78c2008Ff367261CB6285d44ba5eF2E9` using CREATE2.
 
@@ -702,7 +628,7 @@ Source code available at https://github.com/zerodevapp/kernel/blob/8f7fd9946b9d3
 #### How to verify the creation bytecode and the target address
 
 > [!NOTE]
-> Even though the contract address is labelled as being the one for v3.1, it was actually compiled with a previous commit: `8f7fd9946b9d351bb5be0428bf34c87bad7ed6c9`. 
+> Even though the contract address is labeled as being for v3.1, it was actually compiled with a previous commit: `8f7fd9946b9d351bb5be0428bf34c87bad7ed6c9`. 
 
 Follow the build instructions of the repository and obtain the creation bytecode in the artifacts json file. Note that you must build the contracts using foundry with the following configuration:
 
