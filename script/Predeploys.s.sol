@@ -96,25 +96,6 @@ contract Predeploys is Script {
         returns (bytes memory code, bytes32[] memory writeSlots)
     {
         return deployContractViaCreate2(bytecode, salt, expectedAddr, ArachnidsAddress);
-        /*
-        address addr;
-        vm.record();
-        vm.broadcast();
-        assembly {
-            addr := create2(0, add(bytecode, 0x20), mload(bytecode), salt)
-        }
-        vm.stopRecord();
-
-        // Verify that the contract was deployed
-        require(addr != address(0), "CREATE2 failed");
-
-        // Verify that the contract was deployed to the expected address
-        require(addr == expectedAddr, "Contract deployed to incorrect address");
-
-        // Return the runtime bytecode of the deployed contract and the written storage slots
-        code = expectedAddr.code;
-        (, writeSlots) = vm.accesses(expectedAddr);
-        */
     }
 
     /// @notice Deploys a contract's bytecode using CREATE2
