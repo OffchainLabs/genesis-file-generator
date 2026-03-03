@@ -24,6 +24,7 @@ show_help() {
   echo "  CHAIN_OWNER                        Chain owner address"
   echo "  L1_BASE_FEE                        Initial L1 base fee"
   echo "  ENABLE_NATIVE_TOKEN_SUPPLY         Whether to enable native token supply management in ArbOS (true/false)"
+  echo "  ENABLE_TRANSACTION_FILTERING       Whether to enable transaction filtering in ArbOS (true/false)"
   echo "  NITRO_NODE_IMAGE                   Nitro node Docker image"
   echo "  LOAD_DEFAULT_PREDEPLOYS            Whether to include default predeploys in the genesis file (true/false)"
   echo "  CUSTOM_ALLOC_ACCOUNT_FILE          Path to custom alloc account file for additional predeploys (optional)"
@@ -68,7 +69,9 @@ CHAIN_OWNER="$(trim_and_strip_comment "${CHAIN_OWNER:-}")"
 IS_ANYTRUST="$(trim_and_strip_comment "${IS_ANYTRUST:-}")"
 LOAD_DEFAULT_PREDEPLOYS="$(trim_and_strip_comment "${LOAD_DEFAULT_PREDEPLOYS:-}")"
 ENABLE_NATIVE_TOKEN_SUPPLY="$(trim_and_strip_comment "${ENABLE_NATIVE_TOKEN_SUPPLY:-}")"
-export CHAIN_ID ARBOS_VERSION L1_BASE_FEE CHAIN_OWNER IS_ANYTRUST LOAD_DEFAULT_PREDEPLOYS ENABLE_NATIVE_TOKEN_SUPPLY
+ENABLE_TRANSACTION_FILTERING="$(trim_and_strip_comment "${ENABLE_TRANSACTION_FILTERING:-}")"
+
+export CHAIN_ID ARBOS_VERSION L1_BASE_FEE CHAIN_OWNER IS_ANYTRUST LOAD_DEFAULT_PREDEPLOYS ENABLE_NATIVE_TOKEN_SUPPLY ENABLE_TRANSACTION_FILTERING
 
 # Ensure env variables are set
 if [ -z "$CHAIN_ID" ] || [ -z "$L1_BASE_FEE" ] || [ -z "$NITRO_NODE_IMAGE" ] || [ -z "$CHAIN_OWNER" ] || [ -z "$ARBOS_VERSION" ]; then

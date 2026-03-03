@@ -17,8 +17,9 @@ contract GenerateGenesis is Script {
     uint256 arbOSVersion;
     address chainOwner;
     uint256 l1BaseFee;
-    bool enableNativeTokenSupplyManagement;
     bool loadPredeploys;
+    bool enableNativeTokenSupplyManagement;
+    bool enableTransactionFiltering;
 
     function setUp() public {
         // Load environment variables
@@ -33,12 +34,15 @@ contract GenerateGenesis is Script {
         
         string memory l1BaseFeeStr = vm.envString("L1_BASE_FEE");
         l1BaseFee = vm.parseUint(l1BaseFeeStr);
+
+        string memory loadPredeploysStr = vm.envString("LOAD_DEFAULT_PREDEPLOYS");
+        loadPredeploys = (keccak256(abi.encodePacked(loadPredeploysStr)) == keccak256(abi.encodePacked("true")));
         
         string memory enableNativeTokenSupplyManagementStr = vm.envString("ENABLE_NATIVE_TOKEN_SUPPLY");
         enableNativeTokenSupplyManagement = (keccak256(abi.encodePacked(enableNativeTokenSupplyManagementStr)) == keccak256(abi.encodePacked("true")));
         
-        string memory loadPredeploysStr = vm.envString("LOAD_DEFAULT_PREDEPLOYS");
-        loadPredeploys = (keccak256(abi.encodePacked(loadPredeploysStr)) == keccak256(abi.encodePacked("true")));
+        string memory enableTransactionFilteringStr = vm.envString("ENABLE_TRANSACTION_FILTERING");
+        enableTransactionFiltering = (keccak256(abi.encodePacked(enableTransactionFilteringStr)) == keccak256(abi.encodePacked("true")));
     }
 
     function run() public {
@@ -57,6 +61,10 @@ contract GenerateGenesis is Script {
 
         if (enableNativeTokenSupplyManagement) {
             vm.serializeBool(genesisArbOSInit, "nativeTokenSupplyManagementEnabled", true);
+        }
+
+        if (enableTransactionFiltering) {
+            vm.serializeBool(genesisArbOSInit, "transactionFilteringEnabled", true);
         }
 
         genesisArbOSInit = vm.serializeUint(genesisArbOSInit, "initialL1BaseFee", l1BaseFee);
