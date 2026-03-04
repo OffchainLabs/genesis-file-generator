@@ -12,23 +12,7 @@ contract Predeploys is Script {
     /// @notice Main deployer account (for CREATE2 deployments)
     address deployer = makeAddr("deployer");
 
-    /// @notice Output path for the generated JSON file
-    string jsonOutPath = "genesis/genesis.json";
-
-    /// @notice Initial environment variables
-    bool isAnyTrust;
-    uint256 arbOSVersion;
-    address chainOwner;
-
     function setUp() public {
-        // Load environment variables
-        string memory isAnyTrustStr = vm.envString("IS_ANYTRUST");
-        isAnyTrust = (keccak256(abi.encodePacked(isAnyTrustStr)) == keccak256(abi.encodePacked("true")));
-        string memory arbOSVersionStr = vm.envString("ARB_OS_VERSION");
-        arbOSVersion = vm.parseUint(arbOSVersionStr);
-        string memory chainOwnerStr = vm.envString("CHAIN_OWNER");
-        chainOwner = vm.parseAddress(chainOwnerStr);
-
         // Deal funds to deployer accounts
         vm.deal(deployer, 1 ether);
         vm.deal(Multicall3DeployerAddress, 0.1 ether);
@@ -115,25 +99,6 @@ contract Predeploys is Script {
         returns (bytes memory code, bytes32[] memory writeSlots)
     {
         return deployContractViaCreate2(bytecode, salt, expectedAddr, ArachnidsAddress);
-        /*
-        address addr;
-        vm.record();
-        vm.broadcast();
-        assembly {
-            addr := create2(0, add(bytecode, 0x20), mload(bytecode), salt)
-        }
-        vm.stopRecord();
-
-        // Verify that the contract was deployed
-        require(addr != address(0), "CREATE2 failed");
-
-        // Verify that the contract was deployed to the expected address
-        require(addr == expectedAddr, "Contract deployed to incorrect address");
-
-        // Return the runtime bytecode of the deployed contract and the written storage slots
-        code = expectedAddr.code;
-        (, writeSlots) = vm.accesses(expectedAddr);
-        */
     }
 
     /// @notice Deploys a contract's bytecode using CREATE2
@@ -193,7 +158,7 @@ contract Predeploys is Script {
         (, writeSlots) = vm.accesses(expectedAddr);
     }
 
-    function run() public {
+    function run() public returns (string memory) {
         // Initialize JSON output
         string memory genesisAllocJson = "genesisAllocJson";
 
@@ -833,35 +798,6 @@ contract Predeploys is Script {
             genesisAllocJson = vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
         }
 
-        // Form the rest of the JSON structure
-        string memory genesisJson = "genesisJson";
-        uint256 chainId = block.chainid;
-        vm.serializeString(
-            genesisJson,
-            "config",
-            string.concat(
-                '{"chainId":',
-                vm.toString(chainId),
-                ',"homesteadBlock":0,"daoForkBlock":null,"daoForkSupport":true,"eip150Block":0,"eip150Hash":"0x0000000000000000000000000000000000000000000000000000000000000000","eip155Block":0,"eip158Block":0,"byzantiumBlock":0,"constantinopleBlock":0,"petersburgBlock":0,"istanbulBlock":0,"muirGlacierBlock":0,"berlinBlock":0,"londonBlock":0,"clique":{"period":0,"epoch":0},"arbitrum":{"EnableArbOS":true,"AllowDebugPrecompiles":false,"DataAvailabilityCommittee":',
-                vm.toString(isAnyTrust),
-                ',"InitialArbOSVersion":',
-                vm.toString(arbOSVersion),
-                ',"InitialChainOwner":"',
-                vm.toString(chainOwner),
-                '","GenesisBlockNum":0,"MaxCodeSize":24576,"MaxInitCodeSize":49152}}'
-            )
-        );
-        vm.serializeString(genesisJson, "nonce", "0x0");
-        vm.serializeString(genesisJson, "timestamp", "0x0");
-        vm.serializeString(genesisJson, "extraData", "0x");
-        vm.serializeString(genesisJson, "gasLimit", "0x1C9C380"); // 30,000,000
-        vm.serializeString(genesisJson, "difficulty", "0x1");
-        vm.serializeString(genesisJson, "mixHash", "0x0000000000000000000000000000000000000000000000000000000000000000");
-        vm.serializeString(genesisJson, "coinbase", "0x0000000000000000000000000000000000000000");
-        genesisJson = vm.serializeString(genesisJson, "alloc", genesisAllocJson);
-
-        // Write the JSON output to file
-        genesisJson.write(jsonOutPath);
-        console.log("Wrote runtime bytecode to", jsonOutPath);
+        return genesisAllocJson;
     }
 }
