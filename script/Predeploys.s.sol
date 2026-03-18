@@ -688,6 +688,41 @@ contract Predeploys is Script {
             vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
         }
 
+        // ----------------------------------------
+        // ERC-4337 Entrypoint v0.9.0 (via CREATE2)
+        // ----------------------------------------
+        {
+            console.log("Deploying ERC-4337 Entrypoint v0.9.0");
+            address contractAddress = ERC4337_Entrypoint0_9_0Address;
+            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(
+                ERC4337_Entrypoint0_9_0CreationBytecode, ERC4337_Entrypoint0_9_0Salt, ERC4337_Entrypoint0_9_0Address
+            );
+            console.log("Contract deployed at:", contractAddress);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
+        }
+
+        // ------------------------------------------------
+        // ERC-4337 SenderCreator v0.9.0 (already deployed)
+        // ------------------------------------------------
+        // Note: By default, this contract is created when deploying the Entrypoint
+        //       We only check that the deployed bytecode matches the expected one
+        {
+            console.log("Checking ERC-4337 SenderCreator v0.9.0");
+            address contractAddress = ERC4337_SenderCreator0_9_0Address;
+            bytes memory contractCode = contractAddress.code;
+            require(
+                keccak256(contractCode) == keccak256(ERC4337_SenderCreator0_9_0ExpectedRuntimeBytecode),
+                "ERC-4337 SenderCreator bytecode mismatch"
+            );
+            bytes32[] memory contractWriteSlots = new bytes32[](0);
+            console.log("Contract deployed at:", contractAddress);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
+        }
+
         // -----------------------------------------------
         // ERC-4337 Safe Module Setup v0.3.0 (via CREATE2)
         // -----------------------------------------------
