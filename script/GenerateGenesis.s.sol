@@ -14,7 +14,7 @@ contract GenerateGenesis is Script {
 
     /// @notice Initial environment variables
     bool isAnyTrust;
-    uint256 arbOSVersion;
+    uint64 arbOSVersion;
     address chainOwner;
     uint256 l1BaseFee;
     bool loadPredeploys;
@@ -27,7 +27,7 @@ contract GenerateGenesis is Script {
         isAnyTrust = (keccak256(abi.encodePacked(isAnyTrustStr)) == keccak256(abi.encodePacked("true")));
 
         string memory arbOSVersionStr = vm.envString("ARBOS_VERSION");
-        arbOSVersion = vm.parseUint(arbOSVersionStr);
+        arbOSVersion = uint64(vm.parseUint(arbOSVersionStr));
         
         string memory chainOwnerStr = vm.envString("CHAIN_OWNER");
         chainOwner = vm.parseAddress(chainOwnerStr);
@@ -84,7 +84,7 @@ contract GenerateGenesis is Script {
                 vm.toString(arbOSVersion),
                 ',"InitialChainOwner":"',
                 vm.toString(chainOwner),
-                '","GenesisBlockNum":0,"MaxCodeSize":24576,"MaxInitCodeSize":49152}}'
+                '","GenesisBlockNum":0}}'
             )
         );
         vm.serializeString(genesisJson, "arbOSInit", genesisArbOSInit);
