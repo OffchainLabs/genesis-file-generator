@@ -10,7 +10,7 @@ phases:
     commands:
       - echo Logging in to Dockerhub....
       - docker login --username $DOCKERHUB_USERNAME --password $DOCKERHUB_PASSWORD
-      - aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin $REPOSITORY_URI
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $REPOSITORY_URI
       - COMMIT_HASH=$(git rev-parse --short=7 HEAD || echo "latest")
       - >-
         VERSION_TAG=$(git tag --points-at HEAD | sed '/-/!s/$/_/' | sort -rV |
