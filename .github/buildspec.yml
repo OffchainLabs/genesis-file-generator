@@ -8,7 +8,6 @@ env:
 phases:
   pre_build:
     commands:
-      - git submodule update --init --recursive
       - echo Logging in to Dockerhub....
       - docker login --username $DOCKERHUB_USERNAME --password $DOCKERHUB_PASSWORD
       - aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin $REPOSITORY_URI
