@@ -1,0 +1,25 @@
+{
+  "name": "@arbitrum/genesis-file-generator",
+  "version": "1.0.0",
+  "type": "module",
+  "license": "Apache 2.0",
+  "scripts": {
+    "build": "rm -rf dist && tsc",
+    "generate": "dotenv -e .env -- tsx generate.ts",
+    "prettier:check": "prettier --check '**/*.ts'",
+    "prettier:format": "prettier --write '**/*.ts'"
+  },
+  "packageManager": "pnpm@10.30.3",
+  "engines": {
+    "node": ">=24"
+  },
+  "devDependencies": {
+    "@offchainlabs/prettier-config": "^0.3.0",
+    "@trivago/prettier-plugin-sort-imports": "^6.0.2",
+    "@types/node": "^25.6.0",
+    "dotenv-cli": "^11.0.0",
+    "prettier": "^3.8.3",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3"
+  }
+}

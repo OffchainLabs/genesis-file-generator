@@ -23,6 +23,13 @@ Clone the repository
 git clone https://github.com/OffchainLabs/genesis-file-generator.git
 ```
 
+Use Node.js 24 or newer for the TypeScript-based generator tooling.
+
+```shell
+nvm use
+pnpm install
+```
+
 Make a copy of the environment variables file and set the necessary values
 
 ```shell
