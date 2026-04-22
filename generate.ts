@@ -96,7 +96,7 @@ function main(): void {
       ? JSON.stringify(JSON.parse(genesis.serializedChainConfig))
       : JSON.stringify(genesis.serializedChainConfig);
 
-  const output = JSON.stringify(genesis);
+  const output = `${JSON.stringify(genesis, null, 2)}\n`;
   writeFileSync(GENESIS_FILE_PATH, output, 'utf8');
 
   process.stdout.write(`${output}\n`);
