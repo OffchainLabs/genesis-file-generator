@@ -1,0 +1,35 @@
+---
+version: 0.2
+
+env:
+  exported-variables:
+    - IMAGE_TAG
+
+phases:
+  pre_build:
+    commands:
+      - git submodule update --init --recursive
+      - echo Logging in to Dockerhub....
+      - docker login --username $DOCKERHUB_USERNAME --password $DOCKERHUB_PASSWORD
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $REPOSITORY_URI
+      - COMMIT_HASH=$(git rev-parse --short=7 HEAD || echo "latest")
+      - >-
+        VERSION_TAG=$(git tag --points-at HEAD | sed '/-/!s/$/_/' | sort -rV |
+        sed 's/_$//' | head -n 1 | grep ^ || git show -s --pretty=%D | sed 's/, /\n/g' |
+        grep -v '^origin/' |grep -v '^grafted\|HEAD\|master\|main$' || echo "dev")
+      - IMAGE_TAG=${VERSION_TAG}-${COMMIT_HASH}
+      - echo "Using IMAGE_TAG ${IMAGE_TAG}"
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building the Docker image ${IMAGE_TAG}...
+      - >-
+        DOCKER_BUILDKIT=1 docker build . --tag genesis-file-generator
+      - docker tag genesis-file-generator:latest $REPOSITORY_URI:$IMAGE_TAG-$ARCH_TAG
+      - docker tag genesis-file-generator:latest $DOCKERHUB_REPO:$IMAGE_TAG-$ARCH_TAG
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo pushing to repos
+      - docker push $REPOSITORY_URI:$IMAGE_TAG-$ARCH_TAG
+      - docker push $DOCKERHUB_REPO:$IMAGE_TAG-$ARCH_TAG

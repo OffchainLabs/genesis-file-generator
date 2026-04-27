@@ -1,0 +1,50 @@
+---
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - COMMIT_HASH=$(git rev-parse --short=7 HEAD || echo "latest")
+      - >-
+        VERSION_TAG=$(git tag --points-at HEAD | sed '/-/!s/$/_/' | sort -rV |
+        sed 's/_$//' | head -n 1 | grep ^ || git show -s --pretty=%D | sed 's/, /\n/g' |
+        grep -v '^origin/' |grep -v '^grafted\|HEAD\|master\|main$' || echo "dev")
+      - IMAGE_TAG=${VERSION_TAG}-${COMMIT_HASH}
+
+      # Log IMAGE_TAG environment variable
+      - echo "Using IMAGE_TAG environment variable $IMAGE_TAG"
+
+      # Login to ECR
+      - >-
+        aws ecr get-login-password --region $AWS_DEFAULT_REGION |
+        docker login --username AWS --password-stdin $REPOSITORY_URI
+      # Login to DockerHub
+      - echo "$DOCKERHUB_PASSWORD" | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
+      # Enable experimental features while preserving auth
+      - mkdir -p $HOME/.docker
+      - |
+        if [ -f "$HOME/.docker/config.json" ]; then
+          # Add experimental flag to existing config
+          cat $HOME/.docker/config.json | jq '. + {"experimental":"enabled"}' > $HOME/.docker/config.json.tmp
+          mv $HOME/.docker/config.json.tmp $HOME/.docker/config.json
+        else
+          # Create new config with experimental flag
+          echo '{"experimental":"enabled"}' > $HOME/.docker/config.json
+        fi
+
+  build:
+    commands:
+      # ECR manifest
+      - >-
+        docker manifest create $REPOSITORY_URI:$IMAGE_TAG $REPOSITORY_URI:$IMAGE_TAG-amd64
+        $REPOSITORY_URI:$IMAGE_TAG-arm64
+      - docker manifest annotate $REPOSITORY_URI:$IMAGE_TAG $REPOSITORY_URI:$IMAGE_TAG-amd64 --arch amd64
+      - docker manifest annotate $REPOSITORY_URI:$IMAGE_TAG $REPOSITORY_URI:$IMAGE_TAG-arm64 --arch arm64
+      - docker manifest push $REPOSITORY_URI:$IMAGE_TAG
+      # DockerHub manifest
+      - >-
+        docker manifest create $DOCKERHUB_REPO:$IMAGE_TAG $DOCKERHUB_REPO:$IMAGE_TAG-amd64
+        $DOCKERHUB_REPO:$IMAGE_TAG-arm64
+      - docker manifest annotate $DOCKERHUB_REPO:$IMAGE_TAG $DOCKERHUB_REPO:$IMAGE_TAG-amd64 --arch amd64
+      - docker manifest annotate $DOCKERHUB_REPO:$IMAGE_TAG $DOCKERHUB_REPO:$IMAGE_TAG-arm64 --arch arm64
+      - docker manifest push $DOCKERHUB_REPO:$IMAGE_TAG
