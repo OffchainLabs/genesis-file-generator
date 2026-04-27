@@ -15,11 +15,12 @@
 
     "resolveJsonModule": true,
     "skipLibCheck": true,
+    "declaration": true,
 
     "rootDir": ".",
     "outDir": "dist",
 
     "noEmit": false
   },
-  "include": ["**/*.ts"]
+  "include": ["generate.ts"]
 }

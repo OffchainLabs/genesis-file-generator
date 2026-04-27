@@ -10,7 +10,7 @@ contract GenerateGenesis is Script {
     using stdJson for string;
 
     /// @notice Output path for the generated JSON file
-    string jsonOutPath = "genesis/genesis.json";
+    string jsonOutPath;
 
     /// @notice Initial environment variables
     bool isAnyTrust;
@@ -22,6 +22,8 @@ contract GenerateGenesis is Script {
     bool enableTransactionFiltering;
 
     function setUp() public {
+        jsonOutPath = vm.envOr("GENESIS_FILE_PATH", string("genesis/genesis.json"));
+
         // Load environment variables
         string memory isAnyTrustStr = vm.envString("IS_ANYTRUST");
         isAnyTrust = (keccak256(abi.encodePacked(isAnyTrustStr)) == keccak256(abi.encodePacked("true")));

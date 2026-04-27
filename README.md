@@ -23,13 +23,6 @@ Clone the repository
 git clone https://github.com/OffchainLabs/genesis-file-generator.git
 ```
 
-Use Node.js 24 or newer for the TypeScript-based generator tooling.
-
-```shell
-nvm use
-pnpm install
-```
-
 Make a copy of the environment variables file and set the necessary values
 
 ```shell
@@ -39,7 +32,21 @@ cp .env.example .env
 > [!NOTE]
 > Make sure you set the correct values for the environment variables for your chain
 
-Run the script (you must have `forge` (Foundry) and `jq` installed)
+Choose one of the following options to generate the genesis file.
+
+You must have `forge` (Foundry) installed.
+
+### Option 1: Node.js
+
+Use Node.js 24 or newer for the TypeScript-based generator tooling.
+
+```shell
+nvm use
+pnpm install
+pnpm generate
+```
+
+### Option 2: Shell
 
 ```shell
 ./generate.sh
@@ -69,18 +76,18 @@ BlockHash: 0xc8718e3eb62b1fab6ce0ee050385a545c21423a3b164a91545ad9e097fbd5341, S
 
 This tool supports the following environment variables:
 
-| Env variable | Description |
-|------|-------------|
-CHAIN_ID                           | Chain ID for the new chain
-IS_ANYTRUST                        | Whether it's an Anytrust chain (true/false)
-ARBOS_VERSION                      | ArbOS version to use
-CHAIN_OWNER                        | Chain owner address
-L1_BASE_FEE                        | Initial L1 base fee
-ENABLE_NATIVE_TOKEN_SUPPLY         | Whether to enable native token supply management in ArbOS (true/false)
-ENABLE_TRANSACTION_FILTERING       | Whether to enable transaction filtering in ArbOS (true/false)
-NITRO_NODE_IMAGE                   | Nitro node Docker image
-LOAD_DEFAULT_PREDEPLOYS            | Whether to include default predeploys in the genesis file (true/false)
-CUSTOM_ALLOC_ACCOUNT_FILE          | Path to custom alloc account file for additional predeploys (optional)
+| Env variable                 | Description                                                            |
+| ---------------------------- | ---------------------------------------------------------------------- |
+| CHAIN_ID                     | Chain ID for the new chain                                             |
+| IS_ANYTRUST                  | Whether it's an Anytrust chain (true/false)                            |
+| ARBOS_VERSION                | ArbOS version to use                                                   |
+| CHAIN_OWNER                  | Chain owner address                                                    |
+| L1_BASE_FEE                  | Initial L1 base fee                                                    |
+| ENABLE_NATIVE_TOKEN_SUPPLY   | Whether to enable native token supply management in ArbOS (true/false) |
+| ENABLE_TRANSACTION_FILTERING | Whether to enable transaction filtering in ArbOS (true/false)          |
+| NITRO_NODE_IMAGE             | Nitro node Docker image                                                |
+| LOAD_DEFAULT_PREDEPLOYS      | Whether to include default predeploys in the genesis file (true/false) |
+| CUSTOM_ALLOC_ACCOUNT_FILE    | Path to custom alloc account file for additional predeploys (optional) |
 
 ### Custom alloc file format
 
@@ -696,7 +703,7 @@ Source code available at https://github.com/zerodevapp/kernel/blob/8f7fd9946b9d3
 #### How to verify the creation bytecode and the target address
 
 > [!NOTE]
-> Even though the contract address is labeled as being for v3.1, it was actually compiled with a previous commit: `8f7fd9946b9d351bb5be0428bf34c87bad7ed6c9`. 
+> Even though the contract address is labeled as being for v3.1, it was actually compiled with a previous commit: `8f7fd9946b9d351bb5be0428bf34c87bad7ed6c9`.
 
 Follow the build instructions of the repository and obtain the creation bytecode in the artifacts json file. Note that you must build the contracts using foundry with the following configuration:
 

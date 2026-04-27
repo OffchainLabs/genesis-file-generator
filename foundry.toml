@@ -3,8 +3,8 @@ src = "src"
 out = "out"
 libs = ["lib"]
 
-# Allow writing to the genesis folder
-fs_permissions = [{ access = "read-write", path = "./genesis"}]
+# Allow writing to the provided genesis output path
+fs_permissions = [{ access = "read-write", path = "/" }]
 
 # Increase gas limit since we'll be deploying a large number of contracts
 block_gas_limit = 3000000000

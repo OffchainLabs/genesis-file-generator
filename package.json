@@ -3,9 +3,26 @@
   "version": "1.0.0",
   "type": "module",
   "license": "Apache 2.0",
+  "types": "./dist/generate.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/generate.d.ts",
+      "import": "./dist/generate.js",
+      "require": "./dist/generate.js",
+      "default": "./dist/generate.js"
+    }
+  },
+  "files": [
+    "dist",
+    "foundry.toml",
+    "script",
+    "src",
+    "lib/forge-std/src"
+  ],
   "scripts": {
     "build": "rm -rf dist && tsc",
     "generate": "dotenv -e .env -- tsx generate.ts",
+    "prepack": "pnpm build",
     "prettier:check": "prettier --check '**/*.ts'",
     "prettier:format": "prettier --write '**/*.ts'"
   },

@@ -6,8 +6,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ENTRYPOINT_DIR = path.dirname(fileURLToPath(import.meta.url));
-const PROJECT_ROOT = resolveProjectRoot(ENTRYPOINT_DIR);
-const GENESIS_FILE_PATH = path.join(PROJECT_ROOT, 'genesis', 'genesis.json');
+const PACKAGE_ROOT =
+  path.basename(ENTRYPOINT_DIR) === 'dist' ? path.dirname(ENTRYPOINT_DIR) : ENTRYPOINT_DIR;
 const REQUIRED_ENV_VARS = [
   'CHAIN_ID',
   'L1_BASE_FEE',
@@ -16,8 +16,29 @@ const REQUIRED_ENV_VARS = [
   'ARBOS_VERSION',
 ] as const;
 
+const DEFAULT_ENV_VARS = {
+  IS_ANYTRUST: 'false',
+  LOAD_DEFAULT_PREDEPLOYS: 'false',
+  ENABLE_NATIVE_TOKEN_SUPPLY: 'false',
+  ENABLE_TRANSACTION_FILTERING: 'false',
+} as const;
+
 type RequiredEnvVar = (typeof REQUIRED_ENV_VARS)[number];
 type RequiredEnv = NodeJS.ProcessEnv & Record<RequiredEnvVar, string>;
+type Genesis = Record<string, unknown>;
+
+export type GenerateGenesisOptions = {
+  chainId: string;
+  isAnyTrust?: string;
+  arbosVersion: string;
+  chainOwner: string;
+  l1BaseFee: string;
+  nitroNodeImage: string;
+  loadDefaultPredeploys?: string;
+  enableNativeTokenSupply?: string;
+  enableTransactionFiltering?: string;
+  customAllocAccountFile?: string;
+};
 
 const HELP_TEXT = `Usage: pnpm generate [OPTIONS]
 
@@ -39,20 +60,44 @@ Environment variables (set in .env file):
   CUSTOM_ALLOC_ACCOUNT_FILE          Path to custom alloc account file for additional predeploys (optional)
 `;
 
-try {
-  main();
-} catch (error) {
-  process.stderr.write(`Error: ${error instanceof Error ? error.message : String(error)}\n`);
-  process.exit(1);
+if (import.meta.main) {
+  try {
+    if (process.argv.includes('--help') || process.argv.includes('-h')) {
+      printHelp();
+      process.exit(0);
+    }
+
+    const genesis = runGenesisGeneration(process.env);
+    const output = `${JSON.stringify(genesis, null, 2)}\n`;
+    process.stdout.write(`${output}\n`);
+  } catch (error) {
+    process.stderr.write(`Error: ${error instanceof Error ? error.message : String(error)}\n`);
+    process.exit(1);
+  }
 }
 
-function main(): void {
-  if (process.argv.includes('--help') || process.argv.includes('-h')) {
-    printHelp();
-    return;
-  }
+export function generateGenesis(options: GenerateGenesisOptions): Genesis {
+  const env = {
+    ...process.env,
+    CHAIN_ID: options.chainId,
+    IS_ANYTRUST: options.isAnyTrust,
+    ARBOS_VERSION: options.arbosVersion,
+    CHAIN_OWNER: options.chainOwner,
+    L1_BASE_FEE: options.l1BaseFee,
+    NITRO_NODE_IMAGE: options.nitroNodeImage,
+    LOAD_DEFAULT_PREDEPLOYS: options.loadDefaultPredeploys,
+    ENABLE_NATIVE_TOKEN_SUPPLY: options.enableNativeTokenSupply,
+    ENABLE_TRANSACTION_FILTERING: options.enableTransactionFiltering,
+    CUSTOM_ALLOC_ACCOUNT_FILE: options.customAllocAccountFile ?? '',
+  };
 
-  ensureRequiredEnv(process.env);
+  return runGenesisGeneration(env);
+}
+
+function runGenesisGeneration(env: NodeJS.ProcessEnv): Genesis {
+  const resolvedEnv = withDefaultEnvVars(env);
+  ensureRequiredEnv(resolvedEnv);
+  const genesisFilePath = path.join(process.cwd(), 'genesis', 'genesis.json');
 
   // Ensure forge is installed
   try {
@@ -61,21 +106,30 @@ function main(): void {
     throw new Error(`forge is required to run this script.`);
   }
 
-  mkdirSync(path.dirname(GENESIS_FILE_PATH), { recursive: true });
+  mkdirSync(path.dirname(genesisFilePath), { recursive: true });
 
-  execFileSync('forge', [
-    'script',
-    'script/GenerateGenesis.s.sol:GenerateGenesis',
-    '--root',
-    PROJECT_ROOT,
-    '--chain-id',
-    process.env.CHAIN_ID,
-  ]);
+  execFileSync(
+    'forge',
+    [
+      'script',
+      'script/GenerateGenesis.s.sol:GenerateGenesis',
+      '--quiet',
+      '--chain-id',
+      resolvedEnv.CHAIN_ID,
+    ],
+    {
+      cwd: PACKAGE_ROOT,
+      env: {
+        ...resolvedEnv,
+        GENESIS_FILE_PATH: genesisFilePath,
+      },
+    },
+  );
 
-  const genesis = JSON.parse(readFileSync(GENESIS_FILE_PATH, 'utf8'));
+  const genesis = JSON.parse(readFileSync(genesisFilePath, 'utf8'));
 
-  if (process.env.CUSTOM_ALLOC_ACCOUNT_FILE) {
-    const customAllocPath = path.resolve(process.cwd(), process.env.CUSTOM_ALLOC_ACCOUNT_FILE);
+  if (resolvedEnv.CUSTOM_ALLOC_ACCOUNT_FILE) {
+    const customAllocPath = path.resolve(process.cwd(), resolvedEnv.CUSTOM_ALLOC_ACCOUNT_FILE);
     if (!existsSync(customAllocPath)) {
       throw new Error(`Custom alloc account file was specified, but not found: ${customAllocPath}`);
     }
@@ -96,14 +150,26 @@ function main(): void {
       ? JSON.stringify(JSON.parse(genesis.serializedChainConfig))
       : JSON.stringify(genesis.serializedChainConfig);
 
-  const output = `${JSON.stringify(genesis, null, 2)}\n`;
-  writeFileSync(GENESIS_FILE_PATH, output, 'utf8');
+  writeFileSync(genesisFilePath, `${JSON.stringify(genesis, null, 2)}\n`, 'utf8');
 
-  process.stdout.write(`${output}\n`);
+  return genesis;
 }
 
 function printHelp(): void {
   process.stdout.write(HELP_TEXT);
+}
+
+function withDefaultEnvVars(env: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
+  return {
+    ...env,
+    IS_ANYTRUST: env.IS_ANYTRUST || DEFAULT_ENV_VARS.IS_ANYTRUST,
+    LOAD_DEFAULT_PREDEPLOYS:
+      env.LOAD_DEFAULT_PREDEPLOYS || DEFAULT_ENV_VARS.LOAD_DEFAULT_PREDEPLOYS,
+    ENABLE_NATIVE_TOKEN_SUPPLY:
+      env.ENABLE_NATIVE_TOKEN_SUPPLY || DEFAULT_ENV_VARS.ENABLE_NATIVE_TOKEN_SUPPLY,
+    ENABLE_TRANSACTION_FILTERING:
+      env.ENABLE_TRANSACTION_FILTERING || DEFAULT_ENV_VARS.ENABLE_TRANSACTION_FILTERING,
+  };
 }
 
 function ensureRequiredEnv(env: NodeJS.ProcessEnv): asserts env is RequiredEnv {
@@ -112,26 +178,6 @@ function ensureRequiredEnv(env: NodeJS.ProcessEnv): asserts env is RequiredEnv {
     throw new Error(
       `Environment variables are not set in .env. You need to set at least ${missing.join(', ')}`,
     );
-  }
-}
-
-function resolveProjectRoot(startDir: string): string {
-  let currentDir = startDir;
-
-  while (true) {
-    const foundryConfigPath = path.join(currentDir, 'foundry.toml');
-    const generateScriptPath = path.join(currentDir, 'script', 'GenerateGenesis.s.sol');
-
-    if (existsSync(foundryConfigPath) && existsSync(generateScriptPath)) {
-      return currentDir;
-    }
-
-    const parentDir = path.dirname(currentDir);
-    if (parentDir === currentDir) {
-      throw new Error(`Unable to locate the project root from ${startDir}`);
-    }
-
-    currentDir = parentDir;
   }
 }
 
