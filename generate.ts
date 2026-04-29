@@ -67,9 +67,7 @@ if (import.meta.main) {
       process.exit(0);
     }
 
-    const genesis = runGenesisGeneration(process.env);
-    const output = `${JSON.stringify(genesis, null, 2)}\n`;
-    process.stdout.write(`${output}\n`);
+    runGenesisGeneration(process.env);
   } catch (error) {
     process.stderr.write(`Error: ${error instanceof Error ? error.message : String(error)}\n`);
     process.exit(1);
@@ -97,7 +95,7 @@ export function generateGenesis(options: GenerateGenesisOptions): Genesis {
 function runGenesisGeneration(env: NodeJS.ProcessEnv): Genesis {
   const resolvedEnv = withDefaultEnvVars(env);
   ensureRequiredEnv(resolvedEnv);
-  const genesisFilePath = path.join(process.cwd(), 'genesis', 'genesis.json');
+  const genesisFilePath = path.join(PACKAGE_ROOT, 'genesis', 'genesis.json');
 
   // Ensure forge is installed
   try {
@@ -119,10 +117,7 @@ function runGenesisGeneration(env: NodeJS.ProcessEnv): Genesis {
     ],
     {
       cwd: PACKAGE_ROOT,
-      env: {
-        ...resolvedEnv,
-        GENESIS_FILE_PATH: genesisFilePath,
-      },
+      env: resolvedEnv,
     },
   );
 
