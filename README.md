@@ -32,11 +32,30 @@ cp .env.example .env
 > [!NOTE]
 > Make sure you set the correct values for the environment variables for your chain
 
-Choose one of the following options to generate the genesis file.
+Choose one of the following options to generate the genesis file. The Docker option is the recommended path because it includes the required Foundry tooling.
 
-You must have `forge` (Foundry) installed.
+### Option 1: Docker
 
-### Option 1: Node.js
+Build the image and run the generator with your `.env` file. The generated JSON is written to `genesis/genesis.json`.
+
+```shell
+mkdir -p genesis
+docker build -t genesis-file-generator .
+docker run --rm \
+  --env-file .env \
+  -v "$(pwd)/genesis":/app/genesis \
+  genesis-file-generator
+```
+
+### Option 2: Shell
+
+You must have `forge` (Foundry) and `jq` installed.
+
+```shell
+./generate.sh
+```
+
+### Option 3: Node.js
 
 Use Node.js 24 or newer for the TypeScript-based generator tooling.
 
@@ -46,13 +65,31 @@ pnpm install
 pnpm generate
 ```
 
-### Option 2: Shell
+### Option 4: Importing the package
 
-```shell
-./generate.sh
+Use Node.js 24 or newer and install the package in your project. You must also have `forge` (Foundry) installed because the imported generator runs the Foundry script.
+
+```ts
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { generateGenesis } from '@arbitrum/genesis-file-generator';
+
+const genesis = generateGenesis({
+  chainId: '12345',
+  arbosVersion: '40',
+  chainOwner: '0x0000000000000000000000000000000000000000',
+  l1BaseFee: '1000000000',
+  nitroNodeImage: 'offchainlabs/nitro-node:v3.9.5-66e42c4',
+  isAnyTrust: 'false',
+  loadDefaultPredeploys: 'true',
+  enableNativeTokenSupply: 'false',
+  enableTransactionFiltering: 'false',
+});
+
+mkdirSync('genesis', { recursive: true });
+writeFileSync('genesis/genesis.json', `${JSON.stringify(genesis, null, 2)}\n`);
 ```
 
-The script will generate a genesis.json file in `genesis/genesis.json`.
+Each option generates a genesis.json file in `genesis/genesis.json`.
 
 To calculate the BlockHash and SendRoot, run the genesis-generator tool from the Nitro node image separately:
 
