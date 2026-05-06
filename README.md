@@ -124,6 +124,8 @@ This section lists the contracts that are pre-deployed (i.e., loaded into state 
 - [SafeProxyFactory v1.4.1](#safeproxyfactory-v141)
 - [MultiSend v1.4.1](#multisend-v141)
 - [MultiSendCallOnly v1.4.1](#multisendcallonly-v141)
+- [CompatibilityFallbackHandler v1.4.1](#compatibilityfallbackhandler-v141)
+- [SafeToL2Setup v1.4.1](#safetol2setup-v141)
 - [Multicall3](#multicall3)
 - [Create2Deployer](#create2deployer)
 - [CreateX](#createx)
@@ -333,6 +335,37 @@ Deployed at `0x9641d764fc13c8B624c04430C7356C1C7C8102e2` using CREATE2.
 Source code available at https://github.com/safe-global/safe-smart-account/blob/v1.4.1/contracts/libraries/MultiSendCallOnly.sol .
 
 This contract is deployed using the Safe Singleton Factory.
+
+#### How to verify the creation bytecode and the target address
+
+Follow the building instructions of the repository and obtain the creation bytecode in the artifacts json file.
+
+The target address can be verified in the [Safe deployments](https://github.com/safe-global/safe-deployments?tab=readme-ov-file#deployments-overview) repository.
+
+### CompatibilityFallbackHandler v1.4.1
+
+Deployed at `0xfd0732Dc9E303f09fCEf3a7388Ad10A83459Ec99` using CREATE2.
+
+Source code available at https://github.com/safe-global/safe-smart-account/blob/v1.4.1/contracts/handler/CompatibilityFallbackHandler.sol .
+
+This contract is deployed using the Safe Singleton Factory.
+
+#### How to verify the creation bytecode and the target address
+
+Follow the building instructions of the repository and obtain the creation bytecode in the artifacts json file.
+
+The target address can be verified in the [Safe deployments](https://github.com/safe-global/safe-deployments?tab=readme-ov-file#deployments-overview) repository.
+
+### SafeToL2Setup v1.4.1
+
+Deployed at `0xBD89A1CE4DDe368FFAB0eC35506eEcE0b1fFdc54` using CREATE2.
+
+Source code available at https://github.com/safe-fndn/safe-smart-account/blob/v1.4.1-3/contracts/libraries/SafeToL2Setup.sol .
+
+This contract is deployed using the Safe Singleton Factory.
+
+> [!NOTE]
+> This contract was released after `v1.4.1` (in tag `v1.4.1-3` of the `safe-fndn` fork), but no other contract was changed in that release and all creation bytecodes and addresses still match the canonical `v1.4.1` deployments.
 
 #### How to verify the creation bytecode and the target address
 
