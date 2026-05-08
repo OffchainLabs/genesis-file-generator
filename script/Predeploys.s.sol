@@ -410,6 +410,42 @@ contract Predeploys is Script {
             vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
         }
 
+        // --------------------------------------------------
+        // CompatibilityFallbackHandler v1.4.1 - canonical (via CREATE2)
+        // --------------------------------------------------
+        {
+            console.log("Deploying CompatibilityFallbackHandler v1.4.1");
+            address contractAddress = CompatibilityFallbackHandler1_4_1Address;
+            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(
+                CompatibilityFallbackHandler1_4_1CreationBytecode,
+                CompatibilityFallbackHandler1_4_1Salt,
+                CompatibilityFallbackHandler1_4_1Address,
+                SafeSingletonFactoryAddress
+            );
+            console.log("Contract deployed at:", contractAddress);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
+        }
+
+        // --------------------------------------------------
+        // SafeToL2Setup v1.4.1 - canonical (via CREATE2)
+        // --------------------------------------------------
+        {
+            console.log("Deploying SafeToL2Setup v1.4.1");
+            address contractAddress = SafeToL2Setup1_4_1Address;
+            (bytes memory contractCode, bytes32[] memory contractWriteSlots) = deployContractViaCreate2(
+                SafeToL2Setup1_4_1CreationBytecode,
+                SafeToL2Setup1_4_1Salt,
+                SafeToL2Setup1_4_1Address,
+                SafeSingletonFactoryAddress
+            );
+            console.log("Contract deployed at:", contractAddress);
+            string memory contractJson =
+                addPredeployInformationToJson(contractAddress, contractCode, contractWriteSlots);
+            vm.serializeString(genesisAllocJson, vm.toString(contractAddress), contractJson);
+        }
+
         // -----------------------------------
         // Multicall3 (via signed transaction)
         // -----------------------------------
