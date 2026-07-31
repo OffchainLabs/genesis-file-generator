@@ -16,6 +16,8 @@ contract GenerateGenesis is Script {
     bool isAnyTrust;
     uint256 arbOSVersion;
     address chainOwner;
+    uint256 maxCodeSize;
+    uint256 maxInitCodeSize;
     uint256 l1BaseFee;
     bool loadPredeploys;
     bool enableNativeTokenSupplyManagement;
@@ -32,6 +34,12 @@ contract GenerateGenesis is Script {
         
         string memory chainOwnerStr = vm.envString("CHAIN_OWNER");
         chainOwner = vm.parseAddress(chainOwnerStr);
+
+        string memory maxCodeSizeStr = vm.envString("MAX_CODE_SIZE");
+        maxCodeSize = vm.parseUint(maxCodeSizeStr);
+
+        string memory maxInitCodeSizeStr = vm.envString("MAX_INIT_CODE_SIZE");
+        maxInitCodeSize = vm.parseUint(maxInitCodeSizeStr);
         
         string memory l1BaseFeeStr = vm.envString("L1_BASE_FEE");
         l1BaseFee = vm.parseUint(l1BaseFeeStr);
@@ -85,7 +93,11 @@ contract GenerateGenesis is Script {
                 vm.toString(arbOSVersion),
                 ',"InitialChainOwner":"',
                 vm.toString(chainOwner),
-                '","GenesisBlockNum":0}}'
+                '","GenesisBlockNum":0,"MaxCodeSize":',
+                vm.toString(maxCodeSize),
+                ',"MaxInitCodeSize":',
+                vm.toString(maxInitCodeSize),
+                '}}'
             )
         );
         vm.serializeString(genesisJson, "arbOSInit", genesisArbOSInit);
