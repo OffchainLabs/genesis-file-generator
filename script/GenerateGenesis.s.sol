@@ -28,6 +28,7 @@ contract GenerateGenesis is Script {
 
         string memory arbOSVersionStr = vm.envString("ARBOS_VERSION");
         arbOSVersion = vm.parseUint(arbOSVersionStr);
+        require(arbOSVersion <= type(uint64).max, "ArbOS version must fit within uint64");
         
         string memory chainOwnerStr = vm.envString("CHAIN_OWNER");
         chainOwner = vm.parseAddress(chainOwnerStr);
@@ -84,7 +85,7 @@ contract GenerateGenesis is Script {
                 vm.toString(arbOSVersion),
                 ',"InitialChainOwner":"',
                 vm.toString(chainOwner),
-                '","GenesisBlockNum":0,"MaxCodeSize":24576,"MaxInitCodeSize":49152}}'
+                '","GenesisBlockNum":0}}'
             )
         );
         vm.serializeString(genesisJson, "arbOSInit", genesisArbOSInit);
