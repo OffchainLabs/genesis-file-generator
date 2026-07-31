@@ -142,6 +142,8 @@ This section lists the contracts that are pre-deployed (i.e., loaded into state 
 - [ERC-4337 SenderCreator v0.7.0](#erc-4337-sendercreator-v070)
 - [ERC-4337 EntryPoint v0.8.0](#erc-4337-entrypoint-v080)
 - [ERC-4337 SenderCreator v0.8.0](#erc-4337-sendercreator-v080)
+- [ERC-4337 EntryPoint v0.9.0](#erc-4337-entrypoint-v090)
+- [ERC-4337 SenderCreator v0.9.0](#erc-4337-sendercreator-v090)
 - [ERC-4337 Safe Module Setup v0.3.0](#erc-4337-safe-module-setup-v030)
 - [ERC-4337 Safe 4337 Module v0.3.0 (for Entrypoint v0.7.0)](#erc-4337-safe-4337-module-v030-for-entrypoint-v070)
 - [Kernel v3.3 (for Entrypoint v0.7.0)](#kernel-v33-for-entrypoint-v070)
@@ -630,6 +632,34 @@ Follow the build instructions of the repository and obtain the runtime bytecode 
 Note that this contract contains an immutable variable set to the address of the Entrypoint. Thus, the runtime bytecode obtained after compilation will not exactly match. The immutable variable must be set to the right address before comparing it. Additionally, the final IPFS metadata hash obtained when compiling the contract will be different than the one deployed.
 
 Alternatively, the runtime bytecode can be verified in any block explorer, for example, in [Arbiscan](https://arbiscan.io/address/0x449ED7C3e6Fee6a97311d4b55475DF59C44AdD33#code).
+
+### ERC-4337 Entrypoint v0.9.0
+
+Deployed at `0x433709009B8330FDa32311DF1C2AFA402eD8D009` using CREATE2.
+
+Source code available at https://github.com/eth-infinitism/account-abstraction/blob/v0.9.0/contracts/core/EntryPoint.sol .
+
+#### How to verify the creation bytecode and the target address
+
+Follow the build instructions of the repository and obtain the creation bytecode in the artifacts json file.
+
+The target address can be verified in the project's [repository](https://github.com/eth-infinitism/account-abstraction/releases/tag/v0.9.0).
+
+### ERC-4337 SenderCreator v0.9.0
+
+Deployed at `0x0A630a99Df908A81115A3022927Be82f9299987e` while deploying Entrypoint v0.9.0.
+
+Source code available at https://github.com/eth-infinitism/account-abstraction/blob/v0.9.0/contracts/core/SenderCreator.sol .
+
+Since this contract is created when deploying the Entrypoint, we just verify that the runtime bytecode matches the expected one.
+
+#### How to verify the runtime bytecode
+
+Follow the build instructions of the repository and obtain the runtime bytecode in the artifacts json file.
+
+Note that this contract contains an immutable variable set to the address of the Entrypoint. Thus, the runtime bytecode obtained after compilation will not exactly match. The immutable variable must be set to the right address before comparing it. Additionally, the final IPFS metadata hash obtained when compiling the contract will be different than the one deployed.
+
+Alternatively, the runtime bytecode can be verified in any block explorer, for example, in [Arbiscan](https://arbiscan.io/address/0x0A630a99Df908A81115A3022927Be82f9299987e#code).
 
 ### ERC-4337 Safe Module Setup v0.3.0
 
