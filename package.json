@@ -21,6 +21,7 @@
   ],
   "scripts": {
     "build": "rm -rf dist && tsc",
+    "postbuild": "cp package.json dist",
     "generate": "dotenv -e .env -- tsx generate.ts",
     "prepack": "pnpm build",
     "prettier:check": "prettier --check '**/*.ts'",
