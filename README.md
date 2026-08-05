@@ -32,13 +32,64 @@ cp .env.example .env
 > [!NOTE]
 > Make sure you set the correct values for the environment variables for your chain
 
-Run the script (you must have `forge` (Foundry) and `jq` installed)
+Choose one of the following options to generate the genesis file. The Docker option is the recommended path because it includes the required Foundry tooling.
+
+### Option 1: Docker
+
+Build the image and run the generator with your `.env` file. The generated JSON is written to `genesis/genesis.json`.
+
+```shell
+mkdir -p genesis
+docker build -t genesis-file-generator .
+docker run --rm \
+  --env-file .env \
+  -v "$(pwd)/genesis":/app/genesis \
+  genesis-file-generator
+```
+
+### Option 2: Shell
+
+You must have `forge` (Foundry) and `jq` installed.
 
 ```shell
 ./generate.sh
 ```
 
-The script will generate a genesis.json file in `genesis/genesis.json`.
+### Option 3: Node.js
+
+Use Node.js 24 or newer for the TypeScript-based generator tooling.
+
+```shell
+nvm use
+pnpm install
+pnpm generate
+```
+
+### Option 4: Importing the package
+
+Use Node.js 24 or newer and install the package in your project. You must also have `forge` (Foundry) installed because the imported generator runs the Foundry script.
+
+```ts
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { generateGenesis } from '@arbitrum/genesis-file-generator';
+
+const genesis = generateGenesis({
+  chainId: '12345',
+  arbosVersion: '40',
+  chainOwner: '0x0000000000000000000000000000000000000000',
+  l1BaseFee: '1000000000',
+  nitroNodeImage: 'offchainlabs/nitro-node:v3.9.5-66e42c4',
+  isAnyTrust: 'false',
+  loadDefaultPredeploys: 'true',
+  enableNativeTokenSupply: 'false',
+  enableTransactionFiltering: 'false',
+});
+
+mkdirSync('genesis', { recursive: true });
+writeFileSync('genesis/genesis.json', `${JSON.stringify(genesis, null, 2)}\n`);
+```
+
+Each option generates a genesis.json file in `genesis/genesis.json`.
 
 To calculate the BlockHash and SendRoot, run the genesis-generator tool from the Nitro node image separately:
 
@@ -62,18 +113,18 @@ BlockHash: 0xc8718e3eb62b1fab6ce0ee050385a545c21423a3b164a91545ad9e097fbd5341, S
 
 This tool supports the following environment variables:
 
-| Env variable | Description |
-|------|-------------|
-CHAIN_ID                           | Chain ID for the new chain
-IS_ANYTRUST                        | Whether it's an Anytrust chain (true/false)
-ARBOS_VERSION                      | ArbOS version to use
-CHAIN_OWNER                        | Chain owner address
-L1_BASE_FEE                        | Initial L1 base fee
-ENABLE_NATIVE_TOKEN_SUPPLY         | Whether to enable native token supply management in ArbOS (true/false)
-ENABLE_TRANSACTION_FILTERING       | Whether to enable transaction filtering in ArbOS (true/false)
-NITRO_NODE_IMAGE                   | Nitro node Docker image
-LOAD_DEFAULT_PREDEPLOYS            | Whether to include default predeploys in the genesis file (true/false)
-CUSTOM_ALLOC_ACCOUNT_FILE          | Path to custom alloc account file for additional predeploys (optional)
+| Env variable                 | Description                                                            |
+| ---------------------------- | ---------------------------------------------------------------------- |
+| CHAIN_ID                     | Chain ID for the new chain                                             |
+| IS_ANYTRUST                  | Whether it's an Anytrust chain (true/false)                            |
+| ARBOS_VERSION                | ArbOS version to use                                                   |
+| CHAIN_OWNER                  | Chain owner address                                                    |
+| L1_BASE_FEE                  | Initial L1 base fee                                                    |
+| ENABLE_NATIVE_TOKEN_SUPPLY   | Whether to enable native token supply management in ArbOS (true/false) |
+| ENABLE_TRANSACTION_FILTERING | Whether to enable transaction filtering in ArbOS (true/false)          |
+| NITRO_NODE_IMAGE             | Nitro node Docker image                                                |
+| LOAD_DEFAULT_PREDEPLOYS      | Whether to include default predeploys in the genesis file (true/false) |
+| CUSTOM_ALLOC_ACCOUNT_FILE    | Path to custom alloc account file for additional predeploys (optional) |
 
 ### Custom alloc file format
 
@@ -752,7 +803,7 @@ Source code available at https://github.com/zerodevapp/kernel/blob/8f7fd9946b9d3
 #### How to verify the creation bytecode and the target address
 
 > [!NOTE]
-> Even though the contract address is labeled as being for v3.1, it was actually compiled with a previous commit: `8f7fd9946b9d351bb5be0428bf34c87bad7ed6c9`. 
+> Even though the contract address is labeled as being for v3.1, it was actually compiled with a previous commit: `8f7fd9946b9d351bb5be0428bf34c87bad7ed6c9`.
 
 Follow the build instructions of the repository and obtain the creation bytecode in the artifacts json file. Note that you must build the contracts using foundry with the following configuration:
 
