@@ -14,6 +14,8 @@ const REQUIRED_ENV_VARS = [
   'NITRO_NODE_IMAGE',
   'CHAIN_OWNER',
   'ARBOS_VERSION',
+  'MAX_CODE_SIZE',
+  'MAX_INIT_CODE_SIZE',
 ] as const;
 
 const DEFAULT_ENV_VARS = {
@@ -32,6 +34,8 @@ export type GenerateGenesisOptions = {
   isAnyTrust?: string;
   arbosVersion: string;
   chainOwner: string;
+  maxCodeSize: string;
+  maxInitCodeSize: string;
   l1BaseFee: string;
   nitroNodeImage: string;
   loadDefaultPredeploys?: string;
@@ -52,6 +56,8 @@ Environment variables (set in .env file):
   IS_ANYTRUST                        Whether it's an Anytrust chain (true/false)
   ARBOS_VERSION                      ArbOS version to use
   CHAIN_OWNER                        Chain owner address
+  MAX_CODE_SIZE                      Maximum deployed contract code size
+  MAX_INIT_CODE_SIZE                 Maximum contract initialization code size
   L1_BASE_FEE                        Initial L1 base fee
   ENABLE_NATIVE_TOKEN_SUPPLY         Enable native token supply management in ArbOS (true/false)
   ENABLE_TRANSACTION_FILTERING       Enable transaction filtering in ArbOS (true/false)
@@ -81,6 +87,8 @@ export function generateGenesis(options: GenerateGenesisOptions): Genesis {
     IS_ANYTRUST: options.isAnyTrust,
     ARBOS_VERSION: options.arbosVersion,
     CHAIN_OWNER: options.chainOwner,
+    MAX_CODE_SIZE: options.maxCodeSize,
+    MAX_INIT_CODE_SIZE: options.maxInitCodeSize,
     L1_BASE_FEE: options.l1BaseFee,
     NITRO_NODE_IMAGE: options.nitroNodeImage,
     LOAD_DEFAULT_PREDEPLOYS: options.loadDefaultPredeploys,

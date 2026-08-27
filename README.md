@@ -77,6 +77,8 @@ const genesis = generateGenesis({
   chainId: '12345',
   arbosVersion: '40',
   chainOwner: '0x0000000000000000000000000000000000000000',
+  maxCodeSize: '24576',
+  maxInitCodeSize: '49152',
   l1BaseFee: '1000000000',
   nitroNodeImage: 'offchainlabs/nitro-node:v3.9.5-66e42c4',
   isAnyTrust: 'false',
@@ -119,6 +121,8 @@ This tool supports the following environment variables:
 | IS_ANYTRUST                  | Whether it's an Anytrust chain (true/false)                            |
 | ARBOS_VERSION                | ArbOS version to use                                                   |
 | CHAIN_OWNER                  | Chain owner address                                                    |
+| MAX_CODE_SIZE                | Maximum deployed contract code size                                   |
+| MAX_INIT_CODE_SIZE           | Maximum contract initialization code size                             |
 | L1_BASE_FEE                  | Initial L1 base fee                                                    |
 | ENABLE_NATIVE_TOKEN_SUPPLY   | Whether to enable native token supply management in ArbOS (true/false) |
 | ENABLE_TRANSACTION_FILTERING | Whether to enable transaction filtering in ArbOS (true/false)          |
