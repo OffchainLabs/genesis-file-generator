@@ -80,7 +80,6 @@ const genesis = generateGenesis({
   maxCodeSize: '24576',
   maxInitCodeSize: '49152',
   l1BaseFee: '1000000000',
-  nitroNodeImage: 'offchainlabs/nitro-node:v3.9.5-66e42c4',
   isAnyTrust: 'false',
   loadDefaultPredeploys: 'true',
   enableNativeTokenSupply: 'false',
@@ -100,7 +99,7 @@ source .env
 docker run --rm \
   -v "$(pwd)/genesis":/data/genesisDir \
   --entrypoint genesis-generator \
-  "$NITRO_NODE_IMAGE" \
+  offchainlabs/nitro-node:v3.11.3-beb2108 \
   --genesis-json-file /data/genesisDir/genesis.json \
   --initial-l1-base-fee "$L1_BASE_FEE"
 ```
@@ -126,7 +125,6 @@ This tool supports the following environment variables:
 | L1_BASE_FEE                  | Initial L1 base fee                                                    |
 | ENABLE_NATIVE_TOKEN_SUPPLY   | Whether to enable native token supply management in ArbOS (true/false) |
 | ENABLE_TRANSACTION_FILTERING | Whether to enable transaction filtering in ArbOS (true/false)          |
-| NITRO_NODE_IMAGE             | Nitro node Docker image                                                |
 | LOAD_DEFAULT_PREDEPLOYS      | Whether to include default predeploys in the genesis file (true/false) |
 | CUSTOM_ALLOC_ACCOUNT_FILE    | Path to custom alloc account file for additional predeploys (optional) |
 

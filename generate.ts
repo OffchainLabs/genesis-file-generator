@@ -11,7 +11,6 @@ const PACKAGE_ROOT =
 const REQUIRED_ENV_VARS = [
   'CHAIN_ID',
   'L1_BASE_FEE',
-  'NITRO_NODE_IMAGE',
   'CHAIN_OWNER',
   'ARBOS_VERSION',
   'MAX_CODE_SIZE',
@@ -37,7 +36,6 @@ export type GenerateGenesisOptions = {
   maxCodeSize: string;
   maxInitCodeSize: string;
   l1BaseFee: string;
-  nitroNodeImage: string;
   loadDefaultPredeploys?: string;
   enableNativeTokenSupply?: string;
   enableTransactionFiltering?: string;
@@ -61,7 +59,6 @@ Environment variables (set in .env file):
   L1_BASE_FEE                        Initial L1 base fee
   ENABLE_NATIVE_TOKEN_SUPPLY         Enable native token supply management in ArbOS (true/false)
   ENABLE_TRANSACTION_FILTERING       Enable transaction filtering in ArbOS (true/false)
-  NITRO_NODE_IMAGE                   Nitro node Docker image
   LOAD_DEFAULT_PREDEPLOYS            Include default predeploys in the genesis file (true/false)
   CUSTOM_ALLOC_ACCOUNT_FILE          Path to custom alloc account file for additional predeploys (optional)
 `;
@@ -90,7 +87,6 @@ export function generateGenesis(options: GenerateGenesisOptions): Genesis {
     MAX_CODE_SIZE: options.maxCodeSize,
     MAX_INIT_CODE_SIZE: options.maxInitCodeSize,
     L1_BASE_FEE: options.l1BaseFee,
-    NITRO_NODE_IMAGE: options.nitroNodeImage,
     LOAD_DEFAULT_PREDEPLOYS: options.loadDefaultPredeploys,
     ENABLE_NATIVE_TOKEN_SUPPLY: options.enableNativeTokenSupply,
     ENABLE_TRANSACTION_FILTERING: options.enableTransactionFiltering,

@@ -10,7 +10,7 @@ services:
     depends_on:
       genesis-file-generator:
         condition: service_completed_successfully
-    image: "${NITRO_NODE_IMAGE}"
+    image: "offchainlabs/nitro-node:v3.11.3-beb2108"
     container_name: genesis-hash-calculator
     entrypoint: ["genesis-generator"]
     volumes:
