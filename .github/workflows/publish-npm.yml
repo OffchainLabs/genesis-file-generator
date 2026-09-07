@@ -53,11 +53,6 @@ jobs:
           registry-url: https://registry.npmjs.org
           cache: pnpm
 
-      - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
-        with:
-          version: stable
-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -92,16 +87,14 @@ jobs:
       - name: Set package version
         run: npm version "$NPM_PACKAGE_VERSION"
 
-      - name: Build package
-        run: pnpm build
-
       - name: Pack package
-        run: NODE_AUTH_TOKEN="" npm publish --dry-run --tag "$NPM_DIST_TAG"
+        run: npm pack
 
-      - name: Publish package
-        run: NODE_AUTH_TOKEN="" npm publish --tag "$NPM_DIST_TAG"
+      - name: Verify package
+        run: npm publish ./*.tgz --dry-run --tag "$NPM_DIST_TAG"
 
       - name: Push version commit and tag
-        run: |
-          git push origin "HEAD:${GITHUB_REF_NAME}"
-          git push origin "v$NPM_PACKAGE_VERSION"
+        run: git push --atomic origin "HEAD:${GITHUB_REF_NAME}" "refs/tags/v$NPM_PACKAGE_VERSION"
+
+      - name: Publish package
+        run: npm publish ./*.tgz --tag "$NPM_DIST_TAG"

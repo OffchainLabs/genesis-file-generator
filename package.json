@@ -3,6 +3,9 @@
   "version": "0.0.4",
   "type": "module",
   "license": "Apache 2.0",
+  "repository": {
+    "url": "git+https://github.com/OffchainLabs/genesis-file-generator.git"
+  },
   "types": "./dist/generate.d.ts",
   "exports": {
     ".": {
