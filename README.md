@@ -95,11 +95,12 @@ Each option generates a genesis.json file in `genesis/genesis.json`.
 To calculate the BlockHash and SendRoot, run the genesis-generator tool from the Nitro node image separately:
 
 ```shell
-source .env
+NITRO_NODE_IMAGE=...
+L1_BASE_FEE=...
 docker run --rm \
   -v "$(pwd)/genesis":/data/genesisDir \
   --entrypoint genesis-generator \
-  "${NITRO_NODE_IMAGE:-offchainlabs/nitro-node:v3.11.3-beb2108}" \
+  "$NITRO_NODE_IMAGE" \
   --genesis-json-file /data/genesisDir/genesis.json \
   --initial-l1-base-fee "$L1_BASE_FEE"
 ```
@@ -120,12 +121,12 @@ This tool supports the following environment variables:
 | IS_ANYTRUST                  | Whether it's an Anytrust chain (true/false)                            |
 | ARBOS_VERSION                | ArbOS version to use                                                   |
 | CHAIN_OWNER                  | Chain owner address                                                    |
-| MAX_CODE_SIZE                | Maximum deployed contract code size                                   |
-| MAX_INIT_CODE_SIZE           | Maximum contract initialization code size                             |
+| MAX_CODE_SIZE                | Maximum deployed contract code size                                    |
+| MAX_INIT_CODE_SIZE           | Maximum contract initialization code size                              |
 | L1_BASE_FEE                  | Initial L1 base fee                                                    |
 | ENABLE_NATIVE_TOKEN_SUPPLY   | Whether to enable native token supply management in ArbOS (true/false) |
 | ENABLE_TRANSACTION_FILTERING | Whether to enable transaction filtering in ArbOS (true/false)          |
-| NITRO_NODE_IMAGE             | Optional image override for hash calculation; defaults to `offchainlabs/nitro-node:v3.11.3-beb2108` |
+| NITRO_NODE_IMAGE             | Image used to calculate block hash and send root                       |
 | LOAD_DEFAULT_PREDEPLOYS      | Whether to include default predeploys in the genesis file (true/false) |
 | CUSTOM_ALLOC_ACCOUNT_FILE    | Path to custom alloc account file for additional predeploys (optional) |
 
