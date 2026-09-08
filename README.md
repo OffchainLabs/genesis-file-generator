@@ -95,7 +95,7 @@ Each option generates a genesis.json file in `genesis/genesis.json`.
 To calculate the BlockHash and SendRoot, run the genesis-generator tool from the Nitro node image separately:
 
 ```shell
-NITRO_NODE_IMAGE=...
+NITRO_NODE_IMAGE=offchainlabs/nitro-node:vX.Y.Z-abcdef
 L1_BASE_FEE=...
 docker run --rm \
   -v "$(pwd)/genesis":/data/genesisDir \
