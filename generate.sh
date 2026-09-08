@@ -22,10 +22,11 @@ show_help() {
   echo "  IS_ANYTRUST                        Whether it's an Anytrust chain (true/false)"
   echo "  ARBOS_VERSION                      ArbOS version to use"
   echo "  CHAIN_OWNER                        Chain owner address"
+  echo "  MAX_CODE_SIZE                      Maximum deployed contract code size"
+  echo "  MAX_INIT_CODE_SIZE                 Maximum contract initialization code size"
   echo "  L1_BASE_FEE                        Initial L1 base fee"
   echo "  ENABLE_NATIVE_TOKEN_SUPPLY         Whether to enable native token supply management in ArbOS (true/false)"
   echo "  ENABLE_TRANSACTION_FILTERING       Whether to enable transaction filtering in ArbOS (true/false)"
-  echo "  NITRO_NODE_IMAGE                   Nitro node Docker image"
   echo "  LOAD_DEFAULT_PREDEPLOYS            Whether to include default predeploys in the genesis file (true/false)"
   echo "  CUSTOM_ALLOC_ACCOUNT_FILE          Path to custom alloc account file for additional predeploys (optional)"
 }
@@ -66,16 +67,18 @@ CHAIN_ID="$(trim_and_strip_comment "${CHAIN_ID:-}")"
 ARBOS_VERSION="$(trim_and_strip_comment "${ARBOS_VERSION:-}")"
 L1_BASE_FEE="$(trim_and_strip_comment "${L1_BASE_FEE:-}")"
 CHAIN_OWNER="$(trim_and_strip_comment "${CHAIN_OWNER:-}")"
+MAX_CODE_SIZE="$(trim_and_strip_comment "${MAX_CODE_SIZE:-}")"
+MAX_INIT_CODE_SIZE="$(trim_and_strip_comment "${MAX_INIT_CODE_SIZE:-}")"
 IS_ANYTRUST="$(trim_and_strip_comment "${IS_ANYTRUST:-}")"
 LOAD_DEFAULT_PREDEPLOYS="$(trim_and_strip_comment "${LOAD_DEFAULT_PREDEPLOYS:-}")"
 ENABLE_NATIVE_TOKEN_SUPPLY="$(trim_and_strip_comment "${ENABLE_NATIVE_TOKEN_SUPPLY:-}")"
 ENABLE_TRANSACTION_FILTERING="$(trim_and_strip_comment "${ENABLE_TRANSACTION_FILTERING:-}")"
 
-export CHAIN_ID ARBOS_VERSION L1_BASE_FEE CHAIN_OWNER IS_ANYTRUST LOAD_DEFAULT_PREDEPLOYS ENABLE_NATIVE_TOKEN_SUPPLY ENABLE_TRANSACTION_FILTERING
+export CHAIN_ID ARBOS_VERSION L1_BASE_FEE CHAIN_OWNER MAX_CODE_SIZE MAX_INIT_CODE_SIZE IS_ANYTRUST LOAD_DEFAULT_PREDEPLOYS ENABLE_NATIVE_TOKEN_SUPPLY ENABLE_TRANSACTION_FILTERING
 
 # Ensure env variables are set
-if [ -z "$CHAIN_ID" ] || [ -z "$L1_BASE_FEE" ] || [ -z "$NITRO_NODE_IMAGE" ] || [ -z "$CHAIN_OWNER" ] || [ -z "$ARBOS_VERSION" ]; then
-  echo "Error: Environment variables are not set in .env. You need to set at least CHAIN_ID, L1_BASE_FEE, NITRO_NODE_IMAGE, CHAIN_OWNER, and ARBOS_VERSION."
+if [ -z "$CHAIN_ID" ] || [ -z "$L1_BASE_FEE" ] || [ -z "$CHAIN_OWNER" ] || [ -z "$ARBOS_VERSION" ] || [ -z "$MAX_CODE_SIZE" ] || [ -z "$MAX_INIT_CODE_SIZE" ]; then
+  echo "Error: Environment variables are not set in .env. You need to set at least CHAIN_ID, L1_BASE_FEE, CHAIN_OWNER, ARBOS_VERSION, MAX_CODE_SIZE, and MAX_INIT_CODE_SIZE."
   exit 1
 fi
 
