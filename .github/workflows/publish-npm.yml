@@ -32,16 +32,6 @@ jobs:
           echo "NPM_PACKAGE_VERSION=${RELEASE_TAG#v}" >> "$GITHUB_ENV"
           echo "NPM_DIST_TAG=${BASH_REMATCH[5]:-latest}" >> "$GITHUB_ENV"
 
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v6
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          registry-url: https://registry.npmjs.org
-          cache: pnpm
-
       - name: Verify package version matches tag
         run: |
           PACKAGE_VERSION=$(jq -er '.version' package.json)
@@ -50,14 +40,17 @@ jobs:
             exit 1
           fi
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Set up pnpm and Node.js
+        uses: pnpm/setup@v1
+        with:
+          runtime: node@24
+          cache: true
 
       - name: Pack package
-        run: npm pack
+        run: pnpm pack
 
       - name: Verify package
-        run: npm publish ./*.tgz --dry-run --tag "$NPM_DIST_TAG"
+        run: pnpm publish ./*.tgz --dry-run --no-git-checks --tag "$NPM_DIST_TAG"
 
       - name: Publish package
-        run: npm publish ./*.tgz --tag "$NPM_DIST_TAG"
+        run: pnpm publish ./*.tgz --no-git-checks --tag "$NPM_DIST_TAG"
