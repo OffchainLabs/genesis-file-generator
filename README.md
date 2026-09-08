@@ -92,7 +92,7 @@ writeFileSync('genesis/genesis.json', `${JSON.stringify(genesis, null, 2)}\n`);
 
 Each option generates a genesis.json file in `genesis/genesis.json`.
 
-To calculate the BlockHash and SendRoot, run the genesis-generator tool from the Nitro node image separately:
+To calculate the BlockHash and SendRoot, run the genesis-generator tool from the Nitro node image separately. Keep in mind that the minimum nitro version supported is `v3.10.0`, although it's recommended to use the [latest nitro version](https://github.com/OffchainLabs/nitro/releases/latest) available. Additionally, the nitro version used to calculate these hashes must be the same version used when initializing the chain.
 
 ```shell
 NITRO_NODE_IMAGE=offchainlabs/nitro-node:vX.Y.Z-abcdef
