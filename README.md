@@ -15,6 +15,19 @@ Upon initialization, Nitro will use the chain configuration set on-chain (on cha
 
 This repository generates a genesis.json file with a serialized chain configuration (in `serializedChainConfig`) to match the serialized string that is usually sent to the RollupCreator contract. If the genesis.json file is generated with a different tool, special attention must be paid to also serializing the chain configuration and specifying it in a `serializedChainConfig` property of the file.
 
+## Publishing to npm
+
+Manually update the `version` in `package.json` and commit the change. Then create and push a matching version tag from that commit:
+
+```shell
+git tag v1.2.3
+git push origin v1.2.3
+```
+
+The publish workflow verifies that the `package.json` version matches the tag (without the `v` prefix) before publishing to npm. A mismatch fails the workflow. A stable tag such as `v1.2.3` publishes version `1.2.3` to `latest`. Prerelease tags must use `vX.Y.Z-alpha.N`, `vX.Y.Z-beta.N`, or `vX.Y.Z-rc.N` and publish to the corresponding `alpha`, `beta`, or `rc` npm channel.
+
+CI does not modify the package version or create or push commits or tags.
+
 ## How to use this repository
 
 Clone the repository
