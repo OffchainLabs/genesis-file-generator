@@ -50,7 +50,7 @@ jobs:
         run: pnpm pack
 
       - name: Verify package
-        run: pnpm publish ./*.tgz --dry-run --no-git-checks --tag "$NPM_DIST_TAG"
+        run: pnpm stage publish ./*.tgz --dry-run --no-git-checks --tag "$NPM_DIST_TAG"
 
       - name: Publish package
-        run: pnpm publish ./*.tgz --no-git-checks --tag "$NPM_DIST_TAG"
+        run: pnpm stage publish ./*.tgz --no-git-checks --tag "$NPM_DIST_TAG"
