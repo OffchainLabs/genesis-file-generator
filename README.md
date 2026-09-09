@@ -24,7 +24,9 @@ git tag v1.2.3
 git push origin v1.2.3
 ```
 
-The publish workflow verifies that the `package.json` version matches the tag (without the `v` prefix) before publishing to npm. A mismatch fails the workflow. A stable tag such as `v1.2.3` publishes version `1.2.3` to `latest`. Prerelease tags must use `vX.Y.Z-alpha.N`, `vX.Y.Z-beta.N`, or `vX.Y.Z-rc.N` and publish to the corresponding `alpha`, `beta`, or `rc` npm channel.
+The publish workflow verifies that the `package.json` version matches the tag (without the `v` prefix) before staging the package on npm. A mismatch fails the workflow. A stable tag such as `v1.2.3` stages version `1.2.3` with the `latest` npm dist-tag. Prerelease tags must use `vX.Y.Z-alpha.N`, `vX.Y.Z-beta.N`, or `vX.Y.Z-rc.N` and are staged with the corresponding `alpha`, `beta`, or `rc` npm dist-tag.
+
+A successful workflow leaves the package staged and awaiting approval. A maintainer with publish access must review and approve it with two-factor authentication (2FA) before the version becomes available to install and the selected npm dist-tag is updated.
 
 CI does not modify the package version or create or push commits or tags.
 
